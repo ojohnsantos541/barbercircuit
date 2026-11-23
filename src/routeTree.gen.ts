@@ -10,33 +10,144 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PainelRouteImport } from './routes/painel'
+import { Route as PainelIndexRouteImport } from './routes/painel.index'
+import { Route as PainelAgendamentosRouteImport } from './routes/painel.agendamentos'
+import { Route as PainelBarbeirosRouteImport } from './routes/painel.barbeiros'
+import { Route as PainelClientesRouteImport } from './routes/painel.clientes'
+import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configuracoes'
+import { Route as PainelFinanceiroRouteImport } from './routes/painel.financeiro'
+import { Route as PainelRelatoriosRouteImport } from './routes/painel.relatorios'
+import { Route as PainelServicosRouteImport } from './routes/painel.servicos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PainelRoute = PainelRouteImport.update({
+  id: '/painel',
+  path: '/painel',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PainelIndexRoute = PainelIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelAgendamentosRoute = PainelAgendamentosRouteImport.update({
+  id: '/agendamentos',
+  path: '/agendamentos',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelBarbeirosRoute = PainelBarbeirosRouteImport.update({
+  id: '/barbeiros',
+  path: '/barbeiros',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelClientesRoute = PainelClientesRouteImport.update({
+  id: '/clientes',
+  path: '/clientes',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
+  id: '/configuracoes',
+  path: '/configuracoes',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelFinanceiroRoute = PainelFinanceiroRouteImport.update({
+  id: '/financeiro',
+  path: '/financeiro',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelRelatoriosRoute = PainelRelatoriosRouteImport.update({
+  id: '/relatorios',
+  path: '/relatorios',
+  getParentRoute: () => PainelRoute,
+} as any)
+const PainelServicosRoute = PainelServicosRouteImport.update({
+  id: '/servicos',
+  path: '/servicos',
+  getParentRoute: () => PainelRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/painel/agendamentos': typeof PainelAgendamentosRoute
+  '/painel/barbeiros': typeof PainelBarbeirosRoute
+  '/painel/clientes': typeof PainelClientesRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/financeiro': typeof PainelFinanceiroRoute
+  '/painel/relatorios': typeof PainelRelatoriosRoute
+  '/painel/servicos': typeof PainelServicosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/painel/agendamentos': typeof PainelAgendamentosRoute
+  '/painel/barbeiros': typeof PainelBarbeirosRoute
+  '/painel/clientes': typeof PainelClientesRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/financeiro': typeof PainelFinanceiroRoute
+  '/painel/relatorios': typeof PainelRelatoriosRoute
+  '/painel/servicos': typeof PainelServicosRoute
+  '/painel': typeof PainelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/painel': typeof PainelRouteWithChildren
+  '/painel/agendamentos': typeof PainelAgendamentosRoute
+  '/painel/barbeiros': typeof PainelBarbeirosRoute
+  '/painel/clientes': typeof PainelClientesRoute
+  '/painel/configuracoes': typeof PainelConfiguracoesRoute
+  '/painel/financeiro': typeof PainelFinanceiroRoute
+  '/painel/relatorios': typeof PainelRelatoriosRoute
+  '/painel/servicos': typeof PainelServicosRoute
+  '/painel/': typeof PainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/painel'
+    | '/painel/agendamentos'
+    | '/painel/barbeiros'
+    | '/painel/clientes'
+    | '/painel/configuracoes'
+    | '/painel/financeiro'
+    | '/painel/relatorios'
+    | '/painel/servicos'
+    | '/painel/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/painel/agendamentos'
+    | '/painel/barbeiros'
+    | '/painel/clientes'
+    | '/painel/configuracoes'
+    | '/painel/financeiro'
+    | '/painel/relatorios'
+    | '/painel/servicos'
+    | '/painel'
+  id:
+    | '__root__'
+    | '/'
+    | '/painel'
+    | '/painel/agendamentos'
+    | '/painel/barbeiros'
+    | '/painel/clientes'
+    | '/painel/configuracoes'
+    | '/painel/financeiro'
+    | '/painel/relatorios'
+    | '/painel/servicos'
+    | '/painel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PainelRoute: typeof PainelRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +159,100 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/painel': {
+      id: '/painel'
+      path: '/painel'
+      fullPath: '/painel'
+      preLoaderRoute: typeof PainelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/painel/': {
+      id: '/painel/'
+      path: '/'
+      fullPath: '/painel/'
+      preLoaderRoute: typeof PainelIndexRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/agendamentos': {
+      id: '/painel/agendamentos'
+      path: '/agendamentos'
+      fullPath: '/painel/agendamentos'
+      preLoaderRoute: typeof PainelAgendamentosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/barbeiros': {
+      id: '/painel/barbeiros'
+      path: '/barbeiros'
+      fullPath: '/painel/barbeiros'
+      preLoaderRoute: typeof PainelBarbeirosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/clientes': {
+      id: '/painel/clientes'
+      path: '/clientes'
+      fullPath: '/painel/clientes'
+      preLoaderRoute: typeof PainelClientesRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/configuracoes': {
+      id: '/painel/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/painel/configuracoes'
+      preLoaderRoute: typeof PainelConfiguracoesRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/financeiro': {
+      id: '/painel/financeiro'
+      path: '/financeiro'
+      fullPath: '/painel/financeiro'
+      preLoaderRoute: typeof PainelFinanceiroRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/relatorios': {
+      id: '/painel/relatorios'
+      path: '/relatorios'
+      fullPath: '/painel/relatorios'
+      preLoaderRoute: typeof PainelRelatoriosRouteImport
+      parentRoute: typeof PainelRoute
+    }
+    '/painel/servicos': {
+      id: '/painel/servicos'
+      path: '/servicos'
+      fullPath: '/painel/servicos'
+      preLoaderRoute: typeof PainelServicosRouteImport
+      parentRoute: typeof PainelRoute
+    }
   }
 }
 
+interface PainelRouteChildren {
+  PainelAgendamentosRoute: typeof PainelAgendamentosRoute
+  PainelBarbeirosRoute: typeof PainelBarbeirosRoute
+  PainelClientesRoute: typeof PainelClientesRoute
+  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
+  PainelFinanceiroRoute: typeof PainelFinanceiroRoute
+  PainelRelatoriosRoute: typeof PainelRelatoriosRoute
+  PainelServicosRoute: typeof PainelServicosRoute
+  PainelIndexRoute: typeof PainelIndexRoute
+}
+
+const PainelRouteChildren: PainelRouteChildren = {
+  PainelAgendamentosRoute: PainelAgendamentosRoute,
+  PainelBarbeirosRoute: PainelBarbeirosRoute,
+  PainelClientesRoute: PainelClientesRoute,
+  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
+  PainelFinanceiroRoute: PainelFinanceiroRoute,
+  PainelRelatoriosRoute: PainelRelatoriosRoute,
+  PainelServicosRoute: PainelServicosRoute,
+  PainelIndexRoute: PainelIndexRoute,
+}
+
+const PainelRouteWithChildren =
+  PainelRoute._addFileChildren(PainelRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PainelRoute: PainelRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

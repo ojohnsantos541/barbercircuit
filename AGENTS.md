@@ -28,3 +28,8 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application architecture
+- Keep tenant-scoped demonstration data behind getShopData; every entity carries shopId to ease future session-scoped access without implying real security.
+- Use TanStack content routes under /painel and public /b/$slug; the root opens the management dashboard instead of a marketing page.
+- Keep this stage frontend-only: example forms and booking show explicit demo results and never imply persistence, real reservations, sign-in or billing.

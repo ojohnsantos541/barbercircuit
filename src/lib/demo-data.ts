@@ -67,7 +67,7 @@ function buildAppointments(): Appointment[] {
     for (const b of barbers) for (const t of slots) {
       if (r() > 0.55) continue;
       const status: AppointmentStatus = off < 0 ? (r() < 0.08 ? "cancelado" : "concluido") : off === 0 && t < `${String(now.getHours()).padStart(2, "0")}:00` ? "concluido" : "confirmado";
-      out.push({ id: `a${out.length}`, shopId: S, clientId: clients[Math.floor(r() * clients.length)]!.id, barberId: b.id, serviceId: services[Math.floor(r() * services.length)]!.id, date: iso, time: t, status });
+      out.push({ id: `a${out.length}`, shopId: S, clientId: (clients[Math.floor(r() * clients.length)]?.id ?? "c1"), barberId: b.id, serviceId: (services[Math.floor(r() * services.length)]?.id ?? "sv1"), date: iso, time: t, status });
     }
   }
   return out;
@@ -87,7 +87,8 @@ export const expenses: Expense[] = (() => {
 // Ponto único de acesso: no futuro virá da sessão do dono logado.
 export const CURRENT_SHOP_ID = "shop-1";
 export function getShopData(shopId: string = CURRENT_SHOP_ID) {
-  const shop = shops.find((s) => s.id === shopId)!;
+  const shop = shops.find((s) => s.id === shopId);
+  if (!shop) throw new Error("Barbearia não encontrada");
   const by = <T extends { shopId: string }>(l: T[]) => l.filter((x) => x.shopId === shopId);
   return { shop, services: by(services), barbers: by(barbers), clients: by(clients), appointments: by(appointments), expenses: by(expenses) };
 }

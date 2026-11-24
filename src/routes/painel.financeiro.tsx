@@ -1,3 +1,4 @@
+import { DemoAction } from "@/components/barber/DemoAction";
 import { createFileRoute } from "@tanstack/react-router";
 import { ArrowDownRight, ArrowUpRight, PiggyBank, Wallet } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -15,11 +16,11 @@ function Financeiro() {
   const { appointments, expenses, services } = getShopData();
   const months = [2, 1, 0].map((back) => { const d = new Date(); d.setDate(1); d.setMonth(d.getMonth() - back); const key = toISO(d).slice(0, 7);
     return { key, mes: d.toLocaleDateString("pt-BR", { month: "short" }), Receitas: revenueOf(appointments.filter((a) => a.date.startsWith(key))), Despesas: expenses.filter((e) => e.date.startsWith(key)).reduce((s, e) => s + e.amount, 0) }; });
-  const cur = months[2]!; const result = cur.Receitas - cur.Despesas;
+  const cur = months[2] ?? {key:"",Receitas:0,Despesas:0}; const result = cur.Receitas - cur.Despesas;
   const recent = appointments.filter((a) => a.status === "concluido").sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time)).slice(0, 8);
   return (
     <>
-      <PageHeader title="Financeiro" subtitle="Resultado do mês atual" action={<Button variant="gold">Lançar despesa</Button>} />
+      <PageHeader title="Financeiro" subtitle="Resultado do mês atual" action={<DemoAction title="Lançar despesa" fields={["Descrição", "Categoria", "Valor (R$)", "Data"]} />} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Receitas" value={brl(cur.Receitas)} icon={ArrowUpRight} />
         <StatCard label="Despesas" value={brl(cur.Despesas)} icon={ArrowDownRight} />
@@ -37,7 +38,7 @@ function Financeiro() {
           </BarChart></ResponsiveContainer></div>
         </Panel>
         <Panel title="Últimas receitas">
-          <ul className="divide-y">{recent.map((a) => { const s = services.find((x) => x.id === a.serviceId)!; return <li key={a.id} className="flex justify-between py-2.5 text-sm"><span>{s.name} <span className="text-muted-foreground">· {dateBR(a.date)}</span></span><span className="text-success">+ {brl(s.price)}</span></li>; })}</ul>
+          <ul className="divide-y">{recent.map((a) => { const s = services.find((x) => x.id === a.serviceId); return <li key={a.id} className="flex justify-between py-2.5 text-sm"><span>{s?.name} <span className="text-muted-foreground">· {dateBR(a.date)}</span></span><span className="text-success">+ {brl(s?.price ?? 0)}</span></li>; })}</ul>
         </Panel>
         <Panel title="Despesas do mês">
           <ul className="divide-y">{expenses.filter((e) => e.date.startsWith(cur.key)).map((e) => <li key={e.id} className="flex justify-between py-2.5 text-sm"><span>{e.description} <span className="text-muted-foreground">· {e.category}</span></span><span className="text-destructive">− {brl(e.amount)}</span></li>)}</ul>

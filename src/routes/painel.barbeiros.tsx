@@ -1,3 +1,4 @@
+import { DemoAction } from "@/components/barber/DemoAction";
 import { createFileRoute } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/barber/ui";
@@ -15,7 +16,7 @@ function Barbeiros() {
   const month = todayISO().slice(0, 7);
   return (
     <>
-      <PageHeader title="Barbeiros" subtitle="Profissionais e horários de atendimento" action={<Button variant="gold">Novo barbeiro</Button>} />
+      <PageHeader title="Barbeiros" subtitle="Profissionais e horários de atendimento" action={<DemoAction title="Novo barbeiro" fields={["Nome", "Especialidade", "Dias de atendimento", "Horário inicial", "Horário final"]} />} />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {barbers.map((b) => { const mine = appointments.filter((a) => a.barberId === b.id && a.date.startsWith(month)); return (
           <div key={b.id} className="panel p-6">

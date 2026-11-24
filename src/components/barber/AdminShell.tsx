@@ -1,6 +1,7 @@
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 import { BarChart3, Calendar, LayoutDashboard, Menu, Scissors, Settings, Users, UserSquare2, Wallet, ExternalLink, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Logo } from "./ui";
 import { getShopData } from "@/lib/demo-data";
 
@@ -49,23 +50,25 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
 
 export function AdminShell() {
   const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   return (
     <div className="flex min-h-screen w-full">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:block"><Nav /></aside>
+      {!collapsed && <aside className="sticky top-0 hidden h-screen w-64 shrink-0 border-r border-sidebar-border bg-sidebar lg:block"><Nav /></aside>}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setOpen(false)} />
           <aside className="absolute inset-y-0 left-0 w-72 border-r border-sidebar-border bg-sidebar animate-in slide-in-from-left">
-            <button aria-label="Fechar menu" className="absolute right-3 top-6 p-2 text-muted-foreground" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
+            <Button size="icon" variant="ghost" aria-label="Fechar menu" className="absolute right-3 top-6 text-muted-foreground" onClick={() => setOpen(false)}><X className="h-5 w-5" /></Button>
             <Nav onNavigate={() => setOpen(false)} />
           </aside>
         </div>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b bg-background/85 px-4 backdrop-blur lg:hidden">
-          <button aria-label="Abrir menu" onClick={() => setOpen(true)} className="p-1"><Menu className="h-5 w-5" /></button>
+          <Button variant="ghost" size="icon" aria-label="Abrir menu" onClick={() => setOpen(true)}><Menu className="h-5 w-5" /></Button>
           <Logo />
         </header>
+        <div className="hidden items-center justify-between border-b px-8 py-3 lg:flex"><Button title={collapsed ? "Expandir menu" : "Recolher menu"} aria-label={collapsed ? "Expandir menu" : "Recolher menu"} size="icon" variant="ghost" onClick={()=>setCollapsed(!collapsed)}><Menu/></Button><span className="text-xs text-muted-foreground">Conta demonstrativa · Administrador</span></div>
         <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8"><Outlet /></main>
       </div>
     </div>

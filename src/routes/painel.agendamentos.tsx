@@ -1,3 +1,4 @@
+import { DemoAction } from "@/components/barber/DemoAction";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -26,7 +27,7 @@ function Agenda() {
   const weekStart = new Date(cursor); weekStart.setDate(cursor.getDate() - cursor.getDay());
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
   const label = view === "dia" ? cursor.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })
-    : view === "semana" ? `${week[0]!.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} – ${week[6]!.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}`
+    : view === "semana" ? `${(week[0] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} – ${(week[6] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}`
     : cursor.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
   const Card = ({ a }: { a: Appointment }) => (
@@ -37,7 +38,7 @@ function Agenda() {
 
   return (
     <>
-      <PageHeader title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<Button variant="gold">Novo agendamento</Button>} />
+      <PageHeader title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<DemoAction title="Novo agendamento" fields={["Cliente", "Serviço", "Barbeiro", "Data", "Horário"]} />} />
       <div className="panel mb-4 flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Anterior"><ChevronLeft /></Button>

@@ -10,116 +10,140 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PainelRouteImport } from './routes/painel'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedPainelRouteImport } from './routes/_authenticated/painel'
 import { Route as BSlugRouteImport } from './routes/b.$slug'
-import { Route as PainelIndexRouteImport } from './routes/painel.index'
-import { Route as PainelAgendamentosRouteImport } from './routes/painel.agendamentos'
-import { Route as PainelBarbeirosRouteImport } from './routes/painel.barbeiros'
-import { Route as PainelClientesRouteImport } from './routes/painel.clientes'
-import { Route as PainelConfiguracoesRouteImport } from './routes/painel.configuracoes'
-import { Route as PainelFinanceiroRouteImport } from './routes/painel.financeiro'
-import { Route as PainelRelatoriosRouteImport } from './routes/painel.relatorios'
-import { Route as PainelServicosRouteImport } from './routes/painel.servicos'
+import { Route as AuthenticatedPainelIndexRouteImport } from './routes/_authenticated/painel.index'
+import { Route as AuthenticatedPainelAgendamentosRouteImport } from './routes/_authenticated/painel.agendamentos'
+import { Route as AuthenticatedPainelBarbeirosRouteImport } from './routes/_authenticated/painel.barbeiros'
+import { Route as AuthenticatedPainelClientesRouteImport } from './routes/_authenticated/painel.clientes'
+import { Route as AuthenticatedPainelConfiguracoesRouteImport } from './routes/_authenticated/painel.configuracoes'
+import { Route as AuthenticatedPainelFinanceiroRouteImport } from './routes/_authenticated/painel.financeiro'
+import { Route as AuthenticatedPainelRelatoriosRouteImport } from './routes/_authenticated/painel.relatorios'
+import { Route as AuthenticatedPainelServicosRouteImport } from './routes/_authenticated/painel.servicos'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PainelRoute = PainelRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPainelRoute = AuthenticatedPainelRouteImport.update({
   id: '/painel',
   path: '/painel',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const BSlugRoute = BSlugRouteImport.update({
   id: '/b/$slug',
   path: '/b/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PainelIndexRoute = PainelIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelAgendamentosRoute = PainelAgendamentosRouteImport.update({
-  id: '/agendamentos',
-  path: '/agendamentos',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelBarbeirosRoute = PainelBarbeirosRouteImport.update({
-  id: '/barbeiros',
-  path: '/barbeiros',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelClientesRoute = PainelClientesRouteImport.update({
-  id: '/clientes',
-  path: '/clientes',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelConfiguracoesRoute = PainelConfiguracoesRouteImport.update({
-  id: '/configuracoes',
-  path: '/configuracoes',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelFinanceiroRoute = PainelFinanceiroRouteImport.update({
-  id: '/financeiro',
-  path: '/financeiro',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelRelatoriosRoute = PainelRelatoriosRouteImport.update({
-  id: '/relatorios',
-  path: '/relatorios',
-  getParentRoute: () => PainelRoute,
-} as any)
-const PainelServicosRoute = PainelServicosRouteImport.update({
-  id: '/servicos',
-  path: '/servicos',
-  getParentRoute: () => PainelRoute,
-} as any)
+const AuthenticatedPainelIndexRoute =
+  AuthenticatedPainelIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelAgendamentosRoute =
+  AuthenticatedPainelAgendamentosRouteImport.update({
+    id: '/agendamentos',
+    path: '/agendamentos',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelBarbeirosRoute =
+  AuthenticatedPainelBarbeirosRouteImport.update({
+    id: '/barbeiros',
+    path: '/barbeiros',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelClientesRoute =
+  AuthenticatedPainelClientesRouteImport.update({
+    id: '/clientes',
+    path: '/clientes',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelConfiguracoesRoute =
+  AuthenticatedPainelConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelFinanceiroRoute =
+  AuthenticatedPainelFinanceiroRouteImport.update({
+    id: '/financeiro',
+    path: '/financeiro',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelRelatoriosRoute =
+  AuthenticatedPainelRelatoriosRouteImport.update({
+    id: '/relatorios',
+    path: '/relatorios',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
+const AuthenticatedPainelServicosRoute =
+  AuthenticatedPainelServicosRouteImport.update({
+    id: '/servicos',
+    path: '/servicos',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/painel': typeof PainelRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/painel': typeof AuthenticatedPainelRouteWithChildren
   '/b/$slug': typeof BSlugRoute
-  '/painel/agendamentos': typeof PainelAgendamentosRoute
-  '/painel/barbeiros': typeof PainelBarbeirosRoute
-  '/painel/clientes': typeof PainelClientesRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/financeiro': typeof PainelFinanceiroRoute
-  '/painel/relatorios': typeof PainelRelatoriosRoute
-  '/painel/servicos': typeof PainelServicosRoute
-  '/painel/': typeof PainelIndexRoute
+  '/painel/agendamentos': typeof AuthenticatedPainelAgendamentosRoute
+  '/painel/barbeiros': typeof AuthenticatedPainelBarbeirosRoute
+  '/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/painel/configuracoes': typeof AuthenticatedPainelConfiguracoesRoute
+  '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
+  '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
+  '/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRoute
   '/b/$slug': typeof BSlugRoute
-  '/painel/agendamentos': typeof PainelAgendamentosRoute
-  '/painel/barbeiros': typeof PainelBarbeirosRoute
-  '/painel/clientes': typeof PainelClientesRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/financeiro': typeof PainelFinanceiroRoute
-  '/painel/relatorios': typeof PainelRelatoriosRoute
-  '/painel/servicos': typeof PainelServicosRoute
-  '/painel': typeof PainelIndexRoute
+  '/painel/agendamentos': typeof AuthenticatedPainelAgendamentosRoute
+  '/painel/barbeiros': typeof AuthenticatedPainelBarbeirosRoute
+  '/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/painel/configuracoes': typeof AuthenticatedPainelConfiguracoesRoute
+  '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
+  '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
+  '/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/painel': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/painel': typeof PainelRouteWithChildren
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/painel': typeof AuthenticatedPainelRouteWithChildren
   '/b/$slug': typeof BSlugRoute
-  '/painel/agendamentos': typeof PainelAgendamentosRoute
-  '/painel/barbeiros': typeof PainelBarbeirosRoute
-  '/painel/clientes': typeof PainelClientesRoute
-  '/painel/configuracoes': typeof PainelConfiguracoesRoute
-  '/painel/financeiro': typeof PainelFinanceiroRoute
-  '/painel/relatorios': typeof PainelRelatoriosRoute
-  '/painel/servicos': typeof PainelServicosRoute
-  '/painel/': typeof PainelIndexRoute
+  '/_authenticated/painel/agendamentos': typeof AuthenticatedPainelAgendamentosRoute
+  '/_authenticated/painel/barbeiros': typeof AuthenticatedPainelBarbeirosRoute
+  '/_authenticated/painel/clientes': typeof AuthenticatedPainelClientesRoute
+  '/_authenticated/painel/configuracoes': typeof AuthenticatedPainelConfiguracoesRoute
+  '/_authenticated/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
+  '/_authenticated/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
+  '/_authenticated/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/painel'
     | '/b/$slug'
     | '/painel/agendamentos'
@@ -133,6 +157,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/auth'
     | '/b/$slug'
     | '/painel/agendamentos'
     | '/painel/barbeiros'
@@ -145,21 +170,24 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/painel'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/painel'
     | '/b/$slug'
-    | '/painel/agendamentos'
-    | '/painel/barbeiros'
-    | '/painel/clientes'
-    | '/painel/configuracoes'
-    | '/painel/financeiro'
-    | '/painel/relatorios'
-    | '/painel/servicos'
-    | '/painel/'
+    | '/_authenticated/painel/agendamentos'
+    | '/_authenticated/painel/barbeiros'
+    | '/_authenticated/painel/clientes'
+    | '/_authenticated/painel/configuracoes'
+    | '/_authenticated/painel/financeiro'
+    | '/_authenticated/painel/relatorios'
+    | '/_authenticated/painel/servicos'
+    | '/_authenticated/painel/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PainelRoute: typeof PainelRouteWithChildren
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
   BSlugRoute: typeof BSlugRoute
 }
 
@@ -172,12 +200,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/painel': {
-      id: '/painel'
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/painel': {
+      id: '/_authenticated/painel'
       path: '/painel'
       fullPath: '/painel'
-      preLoaderRoute: typeof PainelRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedPainelRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/b/$slug': {
       id: '/b/$slug'
@@ -186,93 +228,105 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/painel/': {
-      id: '/painel/'
+    '/_authenticated/painel/': {
+      id: '/_authenticated/painel/'
       path: '/'
       fullPath: '/painel/'
-      preLoaderRoute: typeof PainelIndexRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelIndexRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/agendamentos': {
-      id: '/painel/agendamentos'
+    '/_authenticated/painel/agendamentos': {
+      id: '/_authenticated/painel/agendamentos'
       path: '/agendamentos'
       fullPath: '/painel/agendamentos'
-      preLoaderRoute: typeof PainelAgendamentosRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelAgendamentosRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/barbeiros': {
-      id: '/painel/barbeiros'
+    '/_authenticated/painel/barbeiros': {
+      id: '/_authenticated/painel/barbeiros'
       path: '/barbeiros'
       fullPath: '/painel/barbeiros'
-      preLoaderRoute: typeof PainelBarbeirosRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelBarbeirosRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/clientes': {
-      id: '/painel/clientes'
+    '/_authenticated/painel/clientes': {
+      id: '/_authenticated/painel/clientes'
       path: '/clientes'
       fullPath: '/painel/clientes'
-      preLoaderRoute: typeof PainelClientesRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelClientesRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/configuracoes': {
-      id: '/painel/configuracoes'
+    '/_authenticated/painel/configuracoes': {
+      id: '/_authenticated/painel/configuracoes'
       path: '/configuracoes'
       fullPath: '/painel/configuracoes'
-      preLoaderRoute: typeof PainelConfiguracoesRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/financeiro': {
-      id: '/painel/financeiro'
+    '/_authenticated/painel/financeiro': {
+      id: '/_authenticated/painel/financeiro'
       path: '/financeiro'
       fullPath: '/painel/financeiro'
-      preLoaderRoute: typeof PainelFinanceiroRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelFinanceiroRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/relatorios': {
-      id: '/painel/relatorios'
+    '/_authenticated/painel/relatorios': {
+      id: '/_authenticated/painel/relatorios'
       path: '/relatorios'
       fullPath: '/painel/relatorios'
-      preLoaderRoute: typeof PainelRelatoriosRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
-    '/painel/servicos': {
-      id: '/painel/servicos'
+    '/_authenticated/painel/servicos': {
+      id: '/_authenticated/painel/servicos'
       path: '/servicos'
       fullPath: '/painel/servicos'
-      preLoaderRoute: typeof PainelServicosRouteImport
-      parentRoute: typeof PainelRoute
+      preLoaderRoute: typeof AuthenticatedPainelServicosRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
     }
   }
 }
 
-interface PainelRouteChildren {
-  PainelAgendamentosRoute: typeof PainelAgendamentosRoute
-  PainelBarbeirosRoute: typeof PainelBarbeirosRoute
-  PainelClientesRoute: typeof PainelClientesRoute
-  PainelConfiguracoesRoute: typeof PainelConfiguracoesRoute
-  PainelFinanceiroRoute: typeof PainelFinanceiroRoute
-  PainelRelatoriosRoute: typeof PainelRelatoriosRoute
-  PainelServicosRoute: typeof PainelServicosRoute
-  PainelIndexRoute: typeof PainelIndexRoute
+interface AuthenticatedPainelRouteChildren {
+  AuthenticatedPainelAgendamentosRoute: typeof AuthenticatedPainelAgendamentosRoute
+  AuthenticatedPainelBarbeirosRoute: typeof AuthenticatedPainelBarbeirosRoute
+  AuthenticatedPainelClientesRoute: typeof AuthenticatedPainelClientesRoute
+  AuthenticatedPainelConfiguracoesRoute: typeof AuthenticatedPainelConfiguracoesRoute
+  AuthenticatedPainelFinanceiroRoute: typeof AuthenticatedPainelFinanceiroRoute
+  AuthenticatedPainelRelatoriosRoute: typeof AuthenticatedPainelRelatoriosRoute
+  AuthenticatedPainelServicosRoute: typeof AuthenticatedPainelServicosRoute
+  AuthenticatedPainelIndexRoute: typeof AuthenticatedPainelIndexRoute
 }
 
-const PainelRouteChildren: PainelRouteChildren = {
-  PainelAgendamentosRoute: PainelAgendamentosRoute,
-  PainelBarbeirosRoute: PainelBarbeirosRoute,
-  PainelClientesRoute: PainelClientesRoute,
-  PainelConfiguracoesRoute: PainelConfiguracoesRoute,
-  PainelFinanceiroRoute: PainelFinanceiroRoute,
-  PainelRelatoriosRoute: PainelRelatoriosRoute,
-  PainelServicosRoute: PainelServicosRoute,
-  PainelIndexRoute: PainelIndexRoute,
+const AuthenticatedPainelRouteChildren: AuthenticatedPainelRouteChildren = {
+  AuthenticatedPainelAgendamentosRoute: AuthenticatedPainelAgendamentosRoute,
+  AuthenticatedPainelBarbeirosRoute: AuthenticatedPainelBarbeirosRoute,
+  AuthenticatedPainelClientesRoute: AuthenticatedPainelClientesRoute,
+  AuthenticatedPainelConfiguracoesRoute: AuthenticatedPainelConfiguracoesRoute,
+  AuthenticatedPainelFinanceiroRoute: AuthenticatedPainelFinanceiroRoute,
+  AuthenticatedPainelRelatoriosRoute: AuthenticatedPainelRelatoriosRoute,
+  AuthenticatedPainelServicosRoute: AuthenticatedPainelServicosRoute,
+  AuthenticatedPainelIndexRoute: AuthenticatedPainelIndexRoute,
 }
 
-const PainelRouteWithChildren =
-  PainelRoute._addFileChildren(PainelRouteChildren)
+const AuthenticatedPainelRouteWithChildren =
+  AuthenticatedPainelRoute._addFileChildren(AuthenticatedPainelRouteChildren)
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedPainelRoute: typeof AuthenticatedPainelRouteWithChildren
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedPainelRoute: AuthenticatedPainelRouteWithChildren,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PainelRoute: PainelRouteWithChildren,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
   BSlugRoute: BSlugRoute,
 }
 export const routeTree = rootRouteImport

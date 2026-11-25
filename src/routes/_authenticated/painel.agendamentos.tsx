@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/barber/ui";
 import { getShopData, toISO, todayISO, type Appointment } from "@/lib/demo-data";
 import { dateBR } from "@/lib/format";
 
-export const Route = createFileRoute("/painel/agendamentos")({
+export const Route = createFileRoute("/_authenticated/painel/agendamentos")({
   head: () => ({ meta: [{ title: "Agendamentos — BarberPro" }, { name: "description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:title", content: "Agendamentos — BarberPro" }, { property: "og:description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Agenda,
 });

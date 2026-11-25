@@ -7,7 +7,7 @@ import { PageHeader } from "@/components/barber/ui";
 import { getShopData } from "@/lib/demo-data";
 import { brl } from "@/lib/format";
 
-export const Route = createFileRoute("/painel/servicos")({
+export const Route = createFileRoute("/_authenticated/painel/servicos")({
   head: () => ({ meta: [{ title: "Serviços — BarberPro" }, { name: "description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:title", content: "Serviços — BarberPro" }, { property: "og:description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Servicos,
 });

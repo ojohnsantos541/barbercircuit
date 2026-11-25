@@ -31,5 +31,5 @@ use the editor.
 
 ## Application architecture
 - Keep tenant-scoped demonstration data behind getShopData; every entity carries shopId to ease future session-scoped access without implying real security.
-- Use TanStack content routes under /painel and public /b/$slug; the root opens the management dashboard instead of a marketing page.
-- Keep this stage frontend-only: example forms and booking show explicit demo results and never imply persistence, real reservations, sign-in or billing.
+- Panel routes live under src/routes/_authenticated/ (Supabase email/password via /auth); public /b/$slug stays outside the gate; root redirects to /painel.
+- The signed-in owner's barbershop comes from myShopQuery (owner_user_id); panel shows onboarding until one exists. Panel lists still use demo data until each screen is migrated.

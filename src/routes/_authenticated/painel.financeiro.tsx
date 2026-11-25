@@ -7,7 +7,7 @@ import { PageHeader, Panel, StatCard } from "@/components/barber/ui";
 import { getShopData, revenueOf, toISO } from "@/lib/demo-data";
 import { brl, dateBR } from "@/lib/format";
 
-export const Route = createFileRoute("/painel/financeiro")({
+export const Route = createFileRoute("/_authenticated/painel/financeiro")({
   head: () => ({ meta: [{ title: "Financeiro — BarberPro" }, { name: "description", content: "Receitas, despesas, faturamento e resultado da barbearia." }, { property: "og:title", content: "Financeiro — BarberPro" }, { property: "og:description", content: "Receitas, despesas, faturamento e resultado da barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Financeiro,
 });

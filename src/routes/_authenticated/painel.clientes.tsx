@@ -8,7 +8,7 @@ import { PageHeader, Panel, StatusPill } from "@/components/barber/ui";
 import { getShopData, revenueOf } from "@/lib/demo-data";
 import { brl, dateBR } from "@/lib/format";
 
-export const Route = createFileRoute("/painel/clientes")({
+export const Route = createFileRoute("/_authenticated/painel/clientes")({
   head: () => ({ meta: [{ title: "Clientes — BarberPro" }, { name: "description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:title", content: "Clientes — BarberPro" }, { property: "og:description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Clientes,
 });

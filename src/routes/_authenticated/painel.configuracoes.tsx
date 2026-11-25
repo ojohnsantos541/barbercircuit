@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { PageHeader, Panel } from "@/components/barber/ui";
 import { getShopData } from "@/lib/demo-data";
 
-export const Route = createFileRoute("/painel/configuracoes")({
+export const Route = createFileRoute("/_authenticated/painel/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — BarberPro" }, { name: "description", content: "Nome, logotipo, endereço, telefone e horários de funcionamento." }, { property: "og:title", content: "Configurações — BarberPro" }, { property: "og:description", content: "Nome, logotipo, endereço, telefone e horários de funcionamento." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Config,
 });

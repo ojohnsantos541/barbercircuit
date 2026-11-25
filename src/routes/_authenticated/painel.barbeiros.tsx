@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/barber/ui";
 import { getShopData, revenueOf, todayISO } from "@/lib/demo-data";
 import { brl } from "@/lib/format";
 
-export const Route = createFileRoute("/painel/barbeiros")({
+export const Route = createFileRoute("/_authenticated/painel/barbeiros")({
   head: () => ({ meta: [{ title: "Barbeiros — BarberPro" }, { name: "description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:title", content: "Barbeiros — BarberPro" }, { property: "og:description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Barbeiros,
 });

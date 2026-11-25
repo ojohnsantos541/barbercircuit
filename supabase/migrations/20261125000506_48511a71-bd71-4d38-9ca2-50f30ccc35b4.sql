@@ -1,0 +1,10 @@
+DROP POLICY "Public views active services" ON public.services;
+DROP POLICY "Public views active barbers" ON public.barbers;
+CREATE POLICY "Anon views active services" ON public.services FOR SELECT TO anon USING (active);
+CREATE POLICY "Anon views active barbers" ON public.barbers FOR SELECT TO anon USING (active);
+CREATE POLICY "Signed-in views active services" ON public.services FOR SELECT TO authenticated USING (active);
+CREATE POLICY "Signed-in views active barbers" ON public.barbers FOR SELECT TO authenticated USING (active);
+REVOKE EXECUTE ON FUNCTION public.handle_new_user() FROM PUBLIC, anon, authenticated;
+REVOKE EXECUTE ON FUNCTION public.is_shop_owner(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_shop_owner(uuid) TO authenticated;
+CREATE INDEX IF NOT EXISTS idx_appointments_service ON public.appointments(service_id);

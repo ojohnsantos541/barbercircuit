@@ -5,11 +5,11 @@ export function DemoBadge() {
   return <span className="inline-flex items-center rounded-full border border-primary/40 bg-primary/10 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary">Dados de exemplo</span>;
 }
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: ReactNode }) {
+export function PageHeader({ title, subtitle, action, demo = true }: { title: string; subtitle?: string; action?: ReactNode; demo?: boolean }) {
   return (
     <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <div className="mb-1"><DemoBadge /></div>
+        {demo && <div className="mb-1"><DemoBadge /></div>}
         <h1 className="text-3xl font-semibold md:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>

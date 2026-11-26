@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 
 import { Toaster } from "@/components/ui/sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { RECOVERY_EVENT, RECOVERY_STORAGE_KEY } from "@/lib/password-recovery";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
@@ -126,7 +127,13 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
+    const { data } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" && session) {
+        sessionStorage.setItem(RECOVERY_STORAGE_KEY, session.user.id);
+        window.dispatchEvent(new Event(RECOVERY_EVENT));
+        return;
+      }
+      if (event === "SIGNED_OUT") sessionStorage.removeItem(RECOVERY_STORAGE_KEY);
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
       if (event !== "SIGNED_OUT") queryClient.invalidateQueries();

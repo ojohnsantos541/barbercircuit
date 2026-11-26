@@ -33,3 +33,4 @@ use the editor.
 - Keep tenant-scoped demonstration data behind getShopData; every entity carries shopId to ease future session-scoped access without implying real security.
 - Panel routes live under src/routes/_authenticated/ (Supabase email/password via /auth); public /b/$slug stays outside the gate; root redirects to /painel.
 - The signed-in owner's barbershop comes from myShopQuery (owner_user_id); panel shows onboarding until one exists. Panel lists still use demo data until each screen is migrated.
+- Password recovery uses the public /reset-password route and the root auth listener; bind recovery intent to the validated user in tab storage so ordinary sessions do not render the recovery form and SDK hash cleanup does not lose recovery state.

@@ -1,37 +1,40 @@
-import { DemoAction } from "@/components/barber/DemoAction";
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { Pencil, Phone, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/barber/ui";
-import { getShopData, revenueOf, todayISO } from "@/lib/demo-data";
-import { brl } from "@/lib/format";
+import { BarberDialog, DeleteButton } from "@/components/barber/CatalogForms";
+import { catalogQuery } from "@/lib/catalog-query";
 
 export const Route = createFileRoute("/_authenticated/painel/barbeiros")({
   head: () => ({ meta: [{ title: "Barbeiros — BarberPro" }, { name: "description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:title", content: "Barbeiros — BarberPro" }, { property: "og:description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  loader: ({ context }) => { void context.queryClient.ensureQueryData(catalogQuery); },
   component: Barbeiros,
+  errorComponent: ({ error }) => <div role="alert" className="panel p-6 text-destructive">{error instanceof Error ? error.message : "Não foi possível carregar."}</div>,
+  notFoundComponent: () => <div className="panel p-6">Página não encontrada.</div>,
 });
-const DAYS = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const initials = (n: string) => n.split(/\s+/).filter(Boolean).slice(0, 2).map((p) => p[0]?.toUpperCase()).join("");
 
 function Barbeiros() {
-  const { barbers, appointments } = getShopData();
-  const month = todayISO().slice(0, 7);
+  const { data: { barbers } } = useSuspenseQuery(catalogQuery);
   return (
     <>
-      <PageHeader title="Barbeiros" subtitle="Profissionais e horários de atendimento" action={<DemoAction title="Novo barbeiro" fields={["Nome", "Especialidade", "Dias de atendimento", "Horário inicial", "Horário final"]} />} />
+      <PageHeader demo={false} title="Barbeiros" subtitle="Profissionais da sua equipe" action={<BarberDialog trigger={<Button><Plus /> Novo barbeiro</Button>} />} />
+      {barbers.length === 0 && <div className="panel p-10 text-center text-muted-foreground">Nenhum barbeiro cadastrado ainda. Clique em “Novo barbeiro” para começar.</div>}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {barbers.map((b) => { const mine = appointments.filter((a) => a.barberId === b.id && a.date.startsWith(month)); return (
-          <div key={b.id} className="panel p-6">
+        {barbers.map((b) => (
+          <div key={b.id} className={`panel p-6 ${b.active ? "" : "opacity-60"}`}>
             <div className="flex items-center gap-4">
-              <span className="grid h-14 w-14 place-items-center rounded-full bg-gold font-display text-xl font-bold text-primary-foreground">{b.initials}</span>
-              <div><h3 className="text-2xl font-semibold">{b.name}</h3><p className="text-sm text-muted-foreground">{b.specialty}</p></div>
+              <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-gold font-display text-xl font-bold text-primary-foreground">{initials(b.name)}</span>
+              <div className="min-w-0 flex-1"><h3 className="truncate text-2xl font-semibold">{b.name}</h3><p className="text-sm text-muted-foreground">{b.specialty || "Barbeiro"}</p></div>
+              <BarberDialog barber={b} trigger={<Button aria-label={`Editar ${b.name}`} size="icon" variant="ghost"><Pencil className="h-4 w-4" /></Button>} /><DeleteButton id={b.id} kind="barbers" name={b.name} />
             </div>
-            <div className="mt-5 text-xs uppercase tracking-wider text-muted-foreground">Dias de atendimento</div>
-            <div className="mt-2 flex gap-1">{DAYS.map((d) => <span key={d} className={`flex-1 rounded py-1 text-center text-[11px] ${b.days.includes(d) ? "bg-primary/15 text-primary" : "bg-secondary text-muted-foreground/50"}`}>{d}</span>)}</div>
-            <div className="mt-4 text-sm">Horário: <span className="text-primary">{b.start} às {b.end}</span></div>
-            <div className="mt-4 grid grid-cols-2 gap-3 border-t pt-4">
-              <div><div className="text-[11px] uppercase text-muted-foreground">Atendimentos/mês</div><div className="font-display text-xl">{mine.filter((a) => a.status === "concluido").length}</div></div>
-              <div><div className="text-[11px] uppercase text-muted-foreground">Faturado/mês</div><div className="font-display text-xl">{brl(revenueOf(mine))}</div></div>
+            <div className="mt-5 flex items-center justify-between border-t pt-4 text-sm">
+              <span className="flex items-center gap-1.5 text-muted-foreground"><Phone className="h-4 w-4" />{b.phone || "Sem telefone"}</span>
+              <span className={b.active ? "text-primary" : "text-muted-foreground"}>{b.active ? "Ativo" : "Inativo"}</span>
             </div>
-          </div>); })}
+          </div>
+        ))}
       </div>
     </>
   );

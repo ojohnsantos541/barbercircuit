@@ -6,4 +6,5 @@
 - [x] Recuperação de senha por e-mail e redefinição da senha (Supabase aceitou a solicitação; recebimento e uso do e-mail dependem de teste pelo titular).
 - [x] Conectar Serviços e Barbeiros: cadastrar, editar, ativar/desativar e excluir.
 - [ ] Verificar cadastros na conta autenticada (acesso de teste indisponível para Supabase externo).
+- [ ] Conectar Clientes: cadastrar, editar, buscar, excluir e histórico.
 - [ ] Ligar as demais telas do painel aos dados reais.

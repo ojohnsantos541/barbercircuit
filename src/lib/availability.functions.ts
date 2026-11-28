@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { spInstant } from "./sp-time";
+import { fetchAllRows } from "./paginated-query";
 
 const weeklySchema = z.object({
   barber_id: z.string().uuid(),
@@ -36,11 +37,13 @@ export const getBarberAvailability = createServerFn({ method: "POST" }).middlewa
   const db = context.supabase as any;
   const [hours, blocks, barbers] = await Promise.all([
     db.from("barber_weekly_hours").select("*").eq("barbershop_id", shopId).order("day_of_week").order("start_time"),
-    db.from("barber_time_blocks").select("*").eq("barbershop_id", shopId).gte("starts_at", new Date().toISOString()).order("starts_at").limit(200),
+    fetchAllRows((pageFrom, pageTo) => db.from("barber_time_blocks").select("*")
+      .eq("barbershop_id", shopId).gte("starts_at", new Date().toISOString())
+      .order("starts_at").order("id").range(pageFrom, pageTo)),
     db.from("barbers").select("id,name,active").eq("barbershop_id", shopId).order("name"),
   ]);
-  if (hours.error || blocks.error || barbers.error) throw new Error("Não foi possível carregar a disponibilidade. Verifique se as tabelas de disponibilidade já foram criadas no Supabase.");
-  return { hours: hours.data ?? [], blocks: blocks.data ?? [], barbers: barbers.data ?? [] };
+  if (hours.error || barbers.error) throw new Error("Não foi possível carregar a disponibilidade. Verifique se as tabelas de disponibilidade já foram criadas no Supabase.");
+  return { hours: hours.data ?? [], blocks, barbers: barbers.data ?? [] };
 });
 
 export const saveBarberWeeklyHour = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => weeklySchema.parse(i)).handler(async ({ data, context }) => {

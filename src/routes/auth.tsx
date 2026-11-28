@@ -9,7 +9,7 @@ import { Logo } from "@/components/barber/ui";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>) => ({ redirect: typeof s["redirect"] === "string" && s["redirect"].startsWith("/") && !s["redirect"].startsWith("//") ? s["redirect"] : "/painel" }),
-  head: () => ({ meta: [{ title: "Entrar — BarberPro" }, { name: "description", content: "Acesse o painel da sua barbearia ou crie sua conta BarberPro." }, { property: "og:title", content: "Entrar — BarberPro" }, { property: "og:description", content: "Acesse o painel da sua barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Entrar — BarberCircuit" }, { name: "description", content: "Acesse o painel da sua barbearia ou crie sua conta BarberCircuit." }, { property: "og:title", content: "Entrar — BarberCircuit" }, { property: "og:description", content: "Acesse o painel da sua barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AuthPage,
 });
 

@@ -110,8 +110,8 @@ export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; da
         </div>
         {f.barber_id && f.date && availability.data && workingHours.length === 0 && <p className="rounded-lg bg-secondary p-3 text-sm text-muted-foreground">Este barbeiro não tem expediente configurado para este dia. Escolha outra data ou ajuste em Disponibilidade.</p>}
         {f.barber_id && f.date && workingHours.length > 0 && selectedService && !availability.isLoading && !dayAppointments.isLoading && availableTimes.length === 0 && <p className="rounded-lg bg-secondary p-3 text-sm text-muted-foreground">Não há horários livres para este serviço nesta data. Horários ocupados, bloqueados ou fora do expediente foram ocultados.</p>}
-        {availability.error && <p role="alert" className="text-sm text-destructive">Não foi possível carregar a disponibilidade. Tente novamente.</p>}
-        {dayAppointments.error && <p role="alert" className="text-sm text-destructive">Não foi possível verificar os horários ocupados. Tente novamente.</p>}
+        {availability.isError && <p role="alert" className="text-sm text-destructive">Não foi possível carregar a disponibilidade. Tente novamente.</p>}
+        {dayAppointments.isError && <p role="alert" className="text-sm text-destructive">Não foi possível verificar os horários ocupados. Tente novamente.</p>}
         <div className="space-y-1.5"><Label>Observações</Label><Textarea value={f.notes} onChange={set("notes")} /></div>
         <DialogFooter><Button type="submit" disabled={m.isPending || availability.isLoading || dayAppointments.isLoading || availability.isError || dayAppointments.isError || !availableTimes.includes(f.time)}>{m.isPending && <Loader2 className="animate-spin" />}Agendar</Button></DialogFooter>
       </form></DialogContent>

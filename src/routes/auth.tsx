@@ -23,7 +23,9 @@ export function AuthPage() {
   async function submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const f = new FormData(e.currentTarget);
-    const email = String(f.get("email")), password = String(f.get("password"));
+    const email = String(f.get("email")).trim().toLowerCase();
+    const password = String(f.get("password"));
+    const name = String(f.get("name") ?? "").trim();
     setLoading(true);
     try {
       if (mode === "entrar") {
@@ -37,13 +39,37 @@ export function AuthPage() {
         if (error) throw error;
         setSent(true);
       } else {
-        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/painel", data: { full_name: String(f.get("name")) } } });
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin + "/painel", data: { full_name: name } } });
         if (error) throw error;
         if (data.session) navigate({ to: "/painel", replace: true }); else setSent(true);
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "";
-      toast.error(mode === "recuperar" ? (msg.toLowerCase().includes("rate") ? "Muitas tentativas. Aguarde alguns minutos antes de tentar novamente." : "Não foi possível enviar o link. Tente novamente.") : msg.includes("Invalid login") ? "E-mail ou senha incorretos." : msg.includes("registered") ? "Este e-mail já possui conta." : msg.includes("confirmed") ? "Confirme seu e-mail antes de entrar." : "Não foi possível continuar. Tente novamente.");
+      const message = err instanceof Error ? err.message : "";
+      const code = typeof err === "object" && err !== null && "code" in err
+        ? String((err as { code?: unknown }).code ?? "")
+        : "";
+      const status = typeof err === "object" && err !== null && "status" in err
+        ? Number((err as { status?: unknown }).status)
+        : 0;
+      const normalized = `${code} ${message}`.toLowerCase();
+
+      let userMessage = "Não foi possível continuar. Tente novamente.";
+      if (normalized.includes("over_email_send_rate_limit") || normalized.includes("email rate limit") || status === 429) {
+        userMessage = "O limite de envio de e-mails de confirmação foi atingido. Aguarde alguns minutos antes de tentar novamente. Se persistir, será necessário configurar o envio de e-mails da barbearia.";
+      } else if (normalized.includes("email_address_invalid") || normalized.includes("email address") && normalized.includes("invalid")) {
+        userMessage = "Este endereço de e-mail não foi aceito. Confira se está correto e tente outro endereço.";
+      } else if (normalized.includes("invalid login") || normalized.includes("invalid_credentials")) {
+        userMessage = "E-mail ou senha incorretos.";
+      } else if (normalized.includes("already registered") || normalized.includes("user_already_exists") || normalized.includes("registered")) {
+        userMessage = "Este e-mail já possui cadastro. Entre na sua conta ou recupere a senha.";
+      } else if (normalized.includes("email not confirmed") || normalized.includes("email_not_confirmed") || normalized.includes("confirmed")) {
+        userMessage = "Confirme seu e-mail antes de entrar.";
+      } else if (normalized.includes("password") && (normalized.includes("at least") || normalized.includes("weak") || normalized.includes("short"))) {
+        userMessage = "A senha não atende aos requisitos. Use uma senha mais forte.";
+      } else if (mode === "recuperar") {
+        userMessage = "Não foi possível enviar o link de recuperação. Confira o e-mail e tente novamente.";
+      }
+      toast.error(userMessage);
     } finally { setLoading(false); }
   }
 

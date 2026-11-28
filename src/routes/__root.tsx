@@ -84,10 +84,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BarberPro — Gestão de barbearias" },
+      { title: "BarberCircuit — Gestão de barbearias" },
       { name: "description", content: "Software de gestão para barbearias: agenda, clientes, financeiro e agendamento online." },
-      { name: "author", content: "BarberPro" },
-      { property: "og:title", content: "BarberPro" },
+      { name: "author", content: "BarberCircuit" },
+      { property: "og:title", content: "BarberCircuit" },
       { property: "og:description", content: "Gestão premium para barbearias." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

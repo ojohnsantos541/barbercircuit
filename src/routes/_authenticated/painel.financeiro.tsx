@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_authenticated/painel/financeiro")({
 
 const todaySP=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 const shift=(date:string,days:number)=>{const [y,m,d]=date.split("-").map(Number);return new Date(Date.UTC(y!,m!-1,d!+days)).toISOString().slice(0,10);};
-const monthKey=(d:string)=>d.slice(0,7);\nconst monthOffset=(date:string,back:number)=>{const[y,m]=date.split("-").map(Number);return new Date(Date.UTC(y!,m!-1-back,1)).toISOString().slice(0,7);};
+const monthKey=(d:string)=>d.slice(0,7);
+const monthOffset=(date:string,back:number)=>{const[y,m]=date.split("-").map(Number);return new Date(Date.UTC(y!,m!-1-back,1)).toISOString().slice(0,7);};
 
 function Financeiro() {
   const today=todaySP(),from=shift(today,-95),to=shift(today,1);

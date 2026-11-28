@@ -15,6 +15,15 @@
 - [x] Página pública consulta dados reais da barbearia, serviços e profissionais ativos.
 - [x] Navegação sem fallback para a barbearia fictícia.
 
+## Notificações e experiência mobile
+- [x] Central visual de notificações no painel com eventos de agendamento em tempo real (novos, cancelados, alterados e mudanças de status).
+- [x] Solicitação de permissão para notificações do navegador e registro do service worker.
+- [x] Service worker preparado para exibir notificações push recebidas e abrir a agenda ao tocar.
+- [ ] Habilitar `appointments` na publicação `supabase_realtime` e validar a entrega de eventos no projeto Supabase.
+- [ ] Criar tabela `push_subscriptions` com RLS por usuário/barbearia e persistência das inscrições de dispositivos.
+- [ ] Configurar VAPID (chave pública no frontend e chave privada em Supabase Secrets) e Edge Function autenticada para envio Web Push.
+- [ ] Criar tabela de notificações persistentes e gatilhos para histórico durável, incluindo lembretes agendados antes do atendimento.
+
 ## Pendências de banco de dados — executar pelo Lovable
 As instruções do projeto reservam as alterações de schema ao Lovable. Não editar migrations manualmente neste repositório.
 

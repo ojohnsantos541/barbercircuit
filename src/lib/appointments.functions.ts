@@ -76,6 +76,7 @@ export const createAppointment = createServerFn({ method: "POST" }).middleware([
 export const setAppointmentStatus = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => statusSchema.parse(i)).handler(async ({ data, context }) => {
   const shopId = await shopOf(context);
   const r = await context.supabase.from("appointments").update({ status: data.status }).eq("id", data.id).eq("barbershop_id", shopId).select("id").single();
+  if (r.error?.code === "23514") throw new Error(r.error.message || "Status inválido para este horário.");
   if (r.error) throw new Error("Não foi possível alterar o status.");
   return r.data;
 });

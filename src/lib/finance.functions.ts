@@ -23,7 +23,7 @@ export const getFinancialData = createServerFn({method:"POST"}).middleware([requ
   const shopId=await getShopId(context);
   const from=spInstant(data.from,"00:00"), to=spInstant(data.to,"00:00");
   const [appointments,expenses]=await Promise.all([
-    context.supabase.from("appointments").select("id,starts_at,status,price,services(name)").eq("barbershop_id",shopId).eq("status","concluido").gte("starts_at",from).lt("starts_at",to).order("starts_at",{ascending:false}).limit(2000),
+    context.supabase.from("appointments").select("id,starts_at,status,price,services(name)").eq("barbershop_id",shopId).eq("status","concluido").gte("starts_at",from).lt("starts_at",to).lte("starts_at",new Date().toISOString()).order("starts_at",{ascending:false}).limit(2000),
     context.supabase.from("expenses").select("id,description,category,amount,expense_date").eq("barbershop_id",shopId).gte("expense_date",data.from).lt("expense_date",data.to).order("expense_date",{ascending:false}).limit(2000)
   ]);
   if(appointments.error||expenses.error) throw new Error("Não foi possível carregar o financeiro.");

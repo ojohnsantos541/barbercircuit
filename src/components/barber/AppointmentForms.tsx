@@ -100,7 +100,7 @@ export function AppointmentDetails({ a, barberName, trigger }: { a: Appt; barber
           ) : <p className="text-xs text-muted-foreground">Cadastre um telefone com DDD no cadastro deste cliente para habilitar as mensagens.</p>}
           <p className="mt-2 text-[11px] text-muted-foreground">O WhatsApp abrirá com a mensagem preenchida. Revise e toque em enviar.</p>
         </div>
-        <div className="grid grid-cols-2 gap-2">{STATUSES.map((x) => <Button key={x} variant={a.status === x ? "default" : "outline"} disabled={st.isPending} onClick={() => st.mutate({ data: { id: a.id, status: x } })}>{STATUS_LABEL[x]}</Button>)}</div>
+        <div className="grid grid-cols-2 gap-2">{STATUSES.map((x) => <Button key={x} variant={a.status === x ? "default" : "outline"} disabled={st.isPending || (x === "concluido" && a.status !== "concluido" && new Date(a.starts_at).getTime() > Date.now())} onClick={() => st.mutate({ data: { id: a.id, status: x } })}>{STATUS_LABEL[x]}</Button>)}</div>
         <DialogFooter><Button variant="ghost" className="text-destructive" disabled={rm.isPending} onClick={() => { if (confirm("Excluir este agendamento?")) rm.mutate({ data: { id: a.id } }); }}><Trash2 /> Excluir</Button></DialogFooter>
       </DialogContent>
     </Dialog>

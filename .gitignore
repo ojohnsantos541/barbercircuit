@@ -1,3 +1,7 @@
+# Environment files (keep only the documented template)
+.env*
+!.env.example
+
 # Logs
 logs
 *.log

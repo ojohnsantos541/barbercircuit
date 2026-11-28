@@ -23,6 +23,8 @@ Permite várias faixas por dia. Exemplo: 09:00–12:00 e 13:00–18:00 represent
 
 - `appointments.ends_at` agora é obrigatório e deve ser posterior a `starts_at`.
 - Uma restrição de exclusão no PostgreSQL impede agendamentos ativos sobrepostos para o mesmo barbeiro, inclusive em requisições concorrentes.
+- Triggers com bloqueio transacional por barbeiro impedem corrida entre a criação de um agendamento e a criação de um bloqueio.
+- O banco também valida expediente semanal e bloqueios quando um agendamento é inserido ou remarcado.
 - Agendamentos cancelados não bloqueiam horários.
 - Relações compostas impedem associar agendamento a barbeiro, cliente ou serviço de outra barbearia.
 - A publicação `supabase_realtime` agora inclui `appointments`, com `REPLICA IDENTITY FULL`.
@@ -33,7 +35,7 @@ Permite várias faixas por dia. Exemplo: 09:00–12:00 e 13:00–18:00 represent
 - Almoço é configurado como duas faixas semanais.
 - Bloqueios pontuais usam data e horário.
 - Sem expediente cadastrado, o agendamento interno falha de forma segura.
-- Antes de remover ou alterar faixas, verificar os compromissos futuros correspondentes.
+- Antes de remover ou alterar faixas, verificar os compromissos futuros correspondentes. A interface ainda precisa implementar essa verificação preventiva.
 
 ## Pendências
 

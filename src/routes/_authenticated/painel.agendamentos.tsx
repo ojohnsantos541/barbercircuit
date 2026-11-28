@@ -54,21 +54,21 @@ function Agenda() {
       <PageHeader demo={false} title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<NewAppointmentDialog date={iso(cursor)} trigger={<Button><Plus /> Novo agendamento</Button>} />} />
       {error && <div role="alert" className="panel mb-4 p-4 text-destructive">{error.message}</div>}
       <div className="panel mb-4 flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
           <Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Anterior"><ChevronLeft /></Button>
           <Button size="sm" variant="outline" onClick={() => setCursor(new Date())}>Hoje</Button>
           <Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Próximo"><ChevronRight /></Button>
-          <span className="ml-2 font-display text-xl capitalize">{label}</span>
+          <span className="ml-1 min-w-0 flex-1 truncate font-display text-lg capitalize sm:ml-2 sm:text-xl">{label}</span>
         </div>
-        <div className="flex rounded-lg bg-secondary p-1">
+        <div className="flex w-full rounded-lg bg-secondary p-1 sm:w-auto">
           {(["dia", "semana", "mes"] as View[]).map((v) => (
-            <button key={v} onClick={() => setView(v)} className={`flex-1 rounded-md px-4 py-1.5 text-sm ${view === v ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground"}`}>{v === "dia" ? "Dia" : v === "semana" ? "Semana" : "Mês"}</button>
+            <button key={v} onClick={() => setView(v)} className={`min-h-10 flex-1 rounded-md px-3 py-1.5 text-sm sm:px-4 ${view === v ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground"}`}>{v === "dia" ? "Dia" : v === "semana" ? "Semana" : "Mês"}</button>
           ))}
         </div>
       </div>
 
       {view === "dia" && (cols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">Cadastre barbeiros para ver a agenda do dia.</div> : (
-        <div className="panel overflow-x-auto">
+        <div className="panel hidden overflow-x-auto md:block">
           <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${cols.length}, 1fr)` }}>
             <div className="border-b p-3" />
             {cols.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
@@ -82,8 +82,30 @@ function Agenda() {
         </div>
       ))}
 
+      {view === "dia" && cols.length > 0 && (
+        <div className="space-y-3 md:hidden">
+          {cols.map((b) => {
+            const items = byDate(iso(cursor)).filter((a) => a.barber_id === b.id).sort((a, z) => a.time.localeCompare(z.time));
+            return <section key={b.id} className="panel p-3">
+              <h3 className="mb-2 text-sm font-semibold">{b.name}</h3>
+              {items.length ? <div className="space-y-2">{items.map((a) => <Card key={a.id} a={a} />)}</div> : <p className="py-2 text-xs text-muted-foreground">Sem atendimentos neste dia.</p>}
+            </section>;
+          })}
+        </div>
+      )}
+
       {view === "semana" && (
-        <div className="panel overflow-x-auto">
+        <>
+          <div className="space-y-3 md:hidden">
+            {week.map((d) => { const k = iso(d); const items = byDate(k); return <section key={k} className="panel p-3">
+              <div className={`mb-2 flex items-center justify-between border-b pb-2 ${k === today ? "text-primary" : ""}`}>
+                <span className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</span>
+                <span className="font-display text-xl">{d.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</span>
+              </div>
+              {items.length ? <div className="space-y-2">{items.map((a) => <Card key={a.id} a={a} />)}</div> : <p className="py-2 text-xs text-muted-foreground">Sem atendimentos.</p>}
+            </section>; })}
+          </div>
+          <div className="panel hidden overflow-x-auto md:block">
           <div className="grid min-w-[860px] grid-cols-7">
             {week.map((d) => { const k = iso(d); const items = byDate(k); return (
               <div key={k} className="min-h-96 border-l first:border-l-0">
@@ -91,7 +113,9 @@ function Agenda() {
                 <div className="space-y-1.5 p-1.5">{items.map((a) => <Card key={a.id} a={a} />)}</div>
               </div>); })}
           </div>
+          </div>
         </div>
+        </>
       )}
 
       {view === "mes" && (() => {

@@ -18,7 +18,7 @@ export const getDashboardData = createServerFn({ method: "POST" })
     const to = spInstant(data.to, "00:00");
     const [appointments, services, barbers, customers] = await Promise.all([
       context.supabase.from("appointments")
-        .select("id, starts_at, ends_at, status, price, barber_id, customer_id, service_id, customers(name), services(name), barbers(name)")
+        .select("id, starts_at, ends_at, status, price, barber_id, customer_id, service_id, customers!appointments_customer_id_fkey(name), services!appointments_service_id_fkey(name), barbers!appointments_barber_id_fkey(name)")
         .eq("barbershop_id", shop.id).gte("starts_at", from).lt("starts_at", to).order("starts_at").limit(2000),
       context.supabase.from("services").select("id, name, active").eq("barbershop_id", shop.id).order("name"),
       context.supabase.from("barbers").select("id, name, active").eq("barbershop_id", shop.id).order("name"),

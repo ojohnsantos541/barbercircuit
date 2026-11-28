@@ -20,7 +20,7 @@ export type Database = {
           barbershop_id: string
           created_at: string
           customer_id: string | null
-          ends_at: string | null
+          ends_at: string
           id: string
           notes: string | null
           price: number
@@ -34,7 +34,7 @@ export type Database = {
           barbershop_id: string
           created_at?: string
           customer_id?: string | null
-          ends_at?: string | null
+          ends_at: string
           id?: string
           notes?: string | null
           price?: number
@@ -48,7 +48,7 @@ export type Database = {
           barbershop_id?: string
           created_at?: string
           customer_id?: string | null
-          ends_at?: string | null
+          ends_at?: string
           id?: string
           notes?: string | null
           price?: number
@@ -66,6 +66,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_barber_same_shop_fk"
+            columns: ["barber_id", "barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id", "barbershop_id"]
+          },
+          {
             foreignKeyName: "appointments_barbershop_id_fkey"
             columns: ["barbershop_id"]
             isOneToOne: false
@@ -80,10 +87,114 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "appointments_customer_same_shop_fk"
+            columns: ["customer_id", "barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id", "barbershop_id"]
+          },
+          {
             foreignKeyName: "appointments_service_id_fkey"
             columns: ["service_id"]
             isOneToOne: false
             referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_service_same_shop_fk"
+            columns: ["service_id", "barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id", "barbershop_id"]
+          },
+        ]
+      }
+      barber_time_blocks: {
+        Row: {
+          barber_id: string
+          barbershop_id: string
+          created_at: string
+          ends_at: string
+          id: string
+          reason: string | null
+          starts_at: string
+        }
+        Insert: {
+          barber_id: string
+          barbershop_id: string
+          created_at?: string
+          ends_at: string
+          id?: string
+          reason?: string | null
+          starts_at: string
+        }
+        Update: {
+          barber_id?: string
+          barbershop_id?: string
+          created_at?: string
+          ends_at?: string
+          id?: string
+          reason?: string | null
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_time_blocks_barber_same_shop_fk"
+            columns: ["barber_id", "barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id", "barbershop_id"]
+          },
+          {
+            foreignKeyName: "barber_time_blocks_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      barber_weekly_hours: {
+        Row: {
+          barber_id: string
+          barbershop_id: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          barber_id: string
+          barbershop_id: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          start_time: string
+        }
+        Update: {
+          barber_id?: string
+          barbershop_id?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "barber_weekly_hours_barber_same_shop_fk"
+            columns: ["barber_id", "barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbers"
+            referencedColumns: ["id", "barbershop_id"]
+          },
+          {
+            foreignKeyName: "barber_weekly_hours_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
             referencedColumns: ["id"]
           },
         ]
@@ -325,6 +436,16 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_public_barbershop_by_slug: {
+        Args: { _slug: string }
+        Returns: {
+          address: string
+          id: string
+          name: string
+          phone: string
+          slug: string
+        }[]
+      }
       is_shop_owner: { Args: { _shop: string }; Returns: boolean }
     }
     Enums: {

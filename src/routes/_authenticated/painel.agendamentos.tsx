@@ -10,7 +10,7 @@ import { getAppointments } from "@/lib/appointments.functions";
 import { spInstant, spParts } from "@/lib/sp-time";
 
 export const Route = createFileRoute("/_authenticated/painel/agendamentos")({
-  head: () => ({ meta: [{ title: "Agendamentos — BarberPro" }, { name: "description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:title", content: "Agendamentos — BarberPro" }, { property: "og:description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Agendamentos — BarberCircuit" }, { name: "description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:title", content: "Agendamentos — BarberCircuit" }, { property: "og:description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Agenda,
 });
 

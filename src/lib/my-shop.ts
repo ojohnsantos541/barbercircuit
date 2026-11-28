@@ -6,7 +6,7 @@ export const myShopQuery = queryOptions({
   queryFn: async () => {
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) return null;
-    const { data, error } = await supabase.from("barbershops").select("*").eq("owner_user_id", u.user.id).order("created_at").limit(1).maybeSingle();
+    const { data, error } = await supabase.from("barbershops").select("*").eq("owner_user_id", u.user.id).maybeSingle();
     if (error) throw error;
     return data;
   },

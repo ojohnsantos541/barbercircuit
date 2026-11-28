@@ -6,7 +6,7 @@ import { getShopData, revenueOf, todayISO, toISO } from "@/lib/demo-data";
 import { brl, dateBR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/painel/")({
-  head: () => ({ meta: [{ title: "Dashboard — BarberPro" }, { name: "description", content: "Visão geral do faturamento e dos agendamentos da barbearia." }, { property: "og:title", content: "Dashboard — BarberPro" }, { property: "og:description", content: "Visão geral do faturamento e dos agendamentos da barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — BarberCircuit" }, { name: "description", content: "Visão geral do faturamento e dos agendamentos da barbearia." }, { property: "og:title", content: "Dashboard — BarberCircuit" }, { property: "og:description", content: "Visão geral do faturamento e dos agendamentos da barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Dashboard,
 });
 

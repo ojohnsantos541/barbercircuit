@@ -78,7 +78,7 @@ function Agenda() {
         </div>
       </div>
 
-      {view === "dia" && (dayCols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">Cadastre barbeiros para ver a agenda do dia.</div> : (
+      {view === "dia" && (dayCols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">{hasConfiguredHours ? "Nenhum barbeiro tem expediente configurado para este dia. Confira a tela Disponibilidade." : "Cadastre barbeiros para ver a agenda do dia."}</div> : (
         <div className="panel hidden overflow-x-auto lg:block">
           <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${dayCols.length}, 1fr)` }}>
             <div className="border-b p-3" />
@@ -118,7 +118,7 @@ function Agenda() {
             </section>; })}
           </div>
           <div className="panel hidden overflow-x-auto lg:block">
-          <div className="grid min-w-[860px] grid-cols-7">
+          <div className="grid min-w-[860px]" style={{ gridTemplateColumns: `repeat(${agendaWeek.length}, minmax(120px, 1fr))` }}>
             {agendaWeek.map((d) => { const k = iso(d); const items = byDate(k); return (
               <div key={k} className="min-h-96 border-l first:border-l-0">
                 <div className={`border-b p-3 text-center ${k === today ? "text-primary" : ""}`}><div className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</div><div className="font-display text-2xl">{d.getDate()}</div></div>

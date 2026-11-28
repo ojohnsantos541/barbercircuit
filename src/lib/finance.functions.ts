@@ -8,10 +8,10 @@ const expenseSchema = z.object({
   description: z.string().trim().min(2).max(120),
   category: z.string().trim().max(60).optional().default("Geral"),
   amount: z.coerce.number().positive().max(100000000),
-  expense_date: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/),
+  expense_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
 });
 const idSchema = z.object({ id: z.string().uuid() });
-const rangeSchema = z.object({ from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/), to: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/) });
+const rangeSchema = z.object({ from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
 
 async function getShopId(context: { supabase: import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>; userId: string }) {
   const { data, error } = await context.supabase.from("barbershops").select("id").eq("owner_user_id", context.userId).maybeSingle();

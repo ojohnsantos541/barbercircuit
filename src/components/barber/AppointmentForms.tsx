@@ -20,7 +20,15 @@ const sel = "flex h-9 w-full rounded-md border border-input bg-transparent px-3 
 export const STATUS_LABEL: Record<string, string> = { confirmado: "Confirmado", em_andamento: "Em andamento", concluido: "Concluído", cancelado: "Cancelado" };
 export type Appt = { id: string; starts_at: string; ends_at: string | null; status: string; price: number; notes: string | null; barber_id: string | null; customers: { name: string } | null; services: { name: string } | null };
 
-function useRefresh() { const qc = useQueryClient(); return () => qc.invalidateQueries({ queryKey: ["owner-appointments"] }); }
+function useRefresh() {
+  const qc = useQueryClient();
+  return async () => {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["owner-appointments"] }),
+      qc.invalidateQueries({ queryKey: ["owner-dashboard"] }),
+    ]);
+  };
+}
 
 export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; date: string }) {
   const [open, setOpen] = useState(false);

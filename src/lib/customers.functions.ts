@@ -12,11 +12,35 @@ async function shopOf({ supabase, userId }: Ctx) {
 
 export const getCustomers = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const shopId = await shopOf(context);
-  const { data, error } = await context.supabase.from("customers")
-    .select("*, appointments(id, starts_at, status, price, services(name), barbers(name))")
-    .eq("barbershop_id", shopId).order("name").limit(1000);
-  if (error) throw new Error("Não foi possível carregar os clientes.");
-  return data;
+  const [customersResult, appointmentsResult] = await Promise.all([
+    context.supabase.from("customers")
+      .select("*")
+      .eq("barbershop_id", shopId)
+      .order("name")
+      .limit(1000),
+    context.supabase.from("appointments")
+      .select("id, customer_id, starts_at, status, price, services!appointments_service_id_fkey(name), barbers!appointments_barber_id_fkey(name)")
+      .eq("barbershop_id", shopId)
+      .not("customer_id", "is", null)
+      .order("starts_at", { ascending: false })
+      .limit(2000),
+  ]);
+  if (customersResult.error || appointmentsResult.error) {
+    throw new Error("Não foi possível carregar os clientes.");
+  }
+
+  const appointmentsByCustomer = new Map<string, NonNullable<typeof appointmentsResult.data>>();
+  for (const appointment of appointmentsResult.data ?? []) {
+    if (!appointment.customer_id) continue;
+    const history = appointmentsByCustomer.get(appointment.customer_id) ?? [];
+    history.push(appointment);
+    appointmentsByCustomer.set(appointment.customer_id, history);
+  }
+
+  return (customersResult.data ?? []).map((customer) => ({
+    ...customer,
+    appointments: appointmentsByCustomer.get(customer.id) ?? [],
+  }));
 });
 
 export const saveCustomer = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => customerSchema.parse(i)).handler(async ({ data, context }) => {

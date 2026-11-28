@@ -1,6 +1,6 @@
-# Barbercircuit
+# BarberCircuit
 
-Crie uma aplicação SaaS chamada BarberPro, especializada na gestão de barbearias masculinas. O sistema será vendido por assinatura para vários donos de barbearias. Cada dono terá sua própria conta administrativa e poderá gerenciar sua barbearia.
+Crie uma aplicação SaaS chamada BarberCircuit, especializada na gestão de barbearias masculinas. O sistema será vendido por assinatura para vários donos de barbearias. Cada dono terá sua própria conta administrativa e poderá gerenciar sua barbearia.
 
 
 

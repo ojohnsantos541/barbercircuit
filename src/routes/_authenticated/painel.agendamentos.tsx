@@ -95,7 +95,7 @@ function Agenda() {
 
       {view === "dia" && dayCols.length > 0 && (
         <div className="space-y-3 lg:hidden">
-          {cols.map((b) => {
+          {dayCols.map((b) => {
             const items = byDate(iso(cursor)).filter((a) => a.barber_id === b.id).sort((a, z) => a.time.localeCompare(z.time));
             return <section key={b.id} className="panel p-3">
               <h3 className="mb-2 text-sm font-semibold">{b.name}</h3>

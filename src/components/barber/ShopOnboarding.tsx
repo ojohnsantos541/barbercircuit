@@ -23,7 +23,7 @@ export function ShopOnboarding() {
     const { error: profileError } = await supabase.from("profiles").upsert(
       {
         id: u.user.id,
-        full_name: typeof u.user.user_metadata?.full_name === "string"
+        full_name: typeof u.user.user_metadata?.['full_name'] === "string"
           ? u.user.user_metadata.full_name.trim() || null
           : null,
       },

@@ -13,6 +13,7 @@
 - [x] Relatórios calculados a partir dos agendamentos reais.
 - [x] Configurações persistentes para nome, endereço, telefone e slug público.
 - [x] Página pública consulta dados reais da barbearia, serviços e profissionais ativos.
+- [x] Página pública com fluxo de escolha de serviço, barbeiro, data, horários livres e confirmação da reserva.
 - [x] Navegação sem fallback para a barbearia fictícia.
 
 ## Notificações e experiência mobile
@@ -32,9 +33,9 @@
 - [x] Criar vínculos compostos para impedir referências entre barbearias diferentes.
 - [x] Exigir `appointments.ends_at` e impedir sobreposição concorrente no banco.
 - [x] Habilitar Realtime em `appointments`.
-- [ ] Criar RPC segura para consultar disponibilidade pública por barbearia, profissional, serviço, expediente e agendamentos existentes.
-- [ ] Criar RPC segura para gravar agendamento público, validar serviço/profissional ativos, criar ou localizar cliente por telefone, registrar snapshot de preço e impedir sobreposição concorrente.
-- [ ] Definir limites/rate limit e validações contra abuso no agendamento público.
+- [x] Criar RPC segura para consultar disponibilidade pública por barbearia, profissional, serviço, expediente e agendamentos existentes.
+- [x] Criar RPC segura para gravar agendamento público, validar serviço/profissional ativos, criar ou localizar cliente por telefone, registrar snapshot de preço e impedir sobreposição concorrente.
+- [ ] Definir rate limit e proteção anti-bot (CAPTCHA) no agendamento público.
 - [x] Restringir a exposição pública de `barbershops` por RPC com campos mínimos e adaptar a página pública.
 - [ ] Adicionar campos persistentes para slogan, logotipo, expediente semanal e preferências de agendamento.
 - [x] Adicionar restrição no banco para impedir conflitos de horário mesmo em duas requisições simultâneas.
@@ -45,7 +46,7 @@
 - [ ] Implementar gestão de plano, assinatura, cancelamento, inadimplência e limites por plano.
 - [x] Criar as tabelas `barber_weekly_hours` e `barber_time_blocks` com RLS para o proprietário (ver docs/disponibilidade-barbercircuit.md).
 - [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).
-- [ ] Conectar as regras de disponibilidade à RPC de agendamento público e validar todos os fluxos no ambiente Supabase real.
+- [x] Conectar a disponibilidade às RPCs públicas e testar uma reserva ponta a ponta em transação revertida (sem criar dados de teste permanentes).
 - [ ] Implementar upload de logotipo com Supabase Storage e políticas de acesso.
 - [ ] Ativar confirmação/lembretes de agendamento por e-mail/WhatsApp conforme provedor escolhido.
 - [ ] Executar testes de integração com uma conta Supabase real, build de produção e lint.
@@ -54,5 +55,5 @@
 ## Observações de integridade
 - Não usar dados fictícios como se fossem dados de clientes.
 - Dashboard e relatórios usam `appointments.price`, não o preço atual do catálogo.
-- O agendamento público ainda não confirma reservas: a página exibe dados reais e encaminha para WhatsApp até a implementação da RPC transacional de reserva.
+- O agendamento público já tem interface e RPC transacional no código e no Supabase. Para oferecer horários, o proprietário precisa configurar expediente em Disponibilidade; ainda é necessário publicar o commit no Lovable e testar no navegador.
 - O status de build/deploy precisa ser confirmado no ambiente Lovable; não foi executado neste ambiente.

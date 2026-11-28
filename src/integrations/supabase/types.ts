@@ -109,6 +109,54 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          appointment_id: string | null
+          barbershop_id: string
+          created_at: string
+          event_type: string
+          id: string
+          message: string
+          read_at: string | null
+          title: string
+        }
+        Insert: {
+          appointment_id?: string | null
+          barbershop_id: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          message: string
+          read_at?: string | null
+          title: string
+        }
+        Update: {
+          appointment_id?: string | null
+          barbershop_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          message?: string
+          read_at?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: false
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_barbershop_id_fkey"
+            columns: ["barbershop_id"]
+            isOneToOne: false
+            referencedRelation: "barbershops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       barber_time_blocks: {
         Row: {
           barber_id: string

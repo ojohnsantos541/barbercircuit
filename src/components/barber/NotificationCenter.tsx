@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Bell, BellRing, Check, Smartphone } from "lucide-react";
+import { Bell, BellRing, Check, Smartphone, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { Button } from "@/components/ui/button";
@@ -92,6 +92,21 @@ export function NotificationCenter({ shopId }: { shopId: string }) {
     setItems((current) => current.map((item) => ({ ...item, read_at: item.read_at ?? now })));
   }
 
+  async function clearAllNotifications() {
+    if (!window.confirm("Deseja apagar todas as notificações? Os agendamentos serão mantidos.")) return;
+    const { error } = await supabase
+      .from("notifications")
+      .delete()
+      .eq("barbershop_id", shopId);
+    if (error) {
+      console.warn("Não foi possível limpar as notificações:", error.message);
+      toast.error("Não foi possível limpar as notificações.");
+      return;
+    }
+    setItems([]);
+    toast.success("Todas as notificações foram apagadas.");
+  }
+
   async function enableNotifications() {
     if (!("Notification" in window)) {
       toast.error("Este navegador não oferece suporte a notificações.");
@@ -131,7 +146,14 @@ export function NotificationCenter({ shopId }: { shopId: string }) {
         <div className="absolute right-0 top-12 z-50 w-[min(22rem,calc(100vw-2rem))] rounded-xl border bg-card p-3 shadow-xl">
           <div className="mb-2 flex items-center justify-between gap-2">
             <div className="font-semibold">Notificações</div>
-            {unreadCount > 0 && <Button size="sm" variant="ghost" onClick={() => void markAllRead()}>Marcar todas como lidas</Button>}
+            <div className="flex items-center gap-1">
+              {unreadCount > 0 && <Button size="sm" variant="ghost" onClick={() => void markAllRead()}>Marcar todas como lidas</Button>}
+              {items.length > 0 && (
+                <Button size="sm" variant="ghost" onClick={() => void clearAllNotifications()} className="text-destructive hover:text-destructive">
+                  <Trash2 className="mr-1 h-3.5 w-3.5" /> Limpar
+                </Button>
+              )}
+            </div>
           </div>
           {permission !== "granted" && (
             <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-3">

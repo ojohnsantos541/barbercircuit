@@ -21,7 +21,7 @@ export const Route = createFileRoute("/_authenticated/painel/financeiro")({
 
 const todaySP=()=>new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
 const shift=(date:string,days:number)=>{const [y,m,d]=date.split("-").map(Number);return new Date(Date.UTC(y!,m!-1,d!+days)).toISOString().slice(0,10);};
-const monthKey=(d:string)=>d.slice(0,7);
+const monthKey=(d:string)=>d.slice(0,7);\nconst monthOffset=(date:string,back:number)=>{const[y,m]=date.split("-").map(Number);return new Date(Date.UTC(y!,m!-1-back,1)).toISOString().slice(0,7);};
 
 function Financeiro() {
   const today=todaySP(),from=shift(today,-95),to=shift(today,1);
@@ -33,7 +33,7 @@ function Financeiro() {
   const create=useMutation({mutationFn:add,onSuccess:async()=>{setForm({description:"",category:"Geral",amount:"",expense_date:today});await refresh();toast.success("Despesa registrada.");},onError:e=>toast.error(e instanceof Error?e.message:"Não foi possível registrar.")});
   const del=useMutation({mutationFn:remove,onSuccess:async()=>{await refresh();toast.success("Despesa excluída.");},onError:e=>toast.error(e instanceof Error?e.message:"Não foi possível excluir.")});
   const appointments=data?.appointments??[],expenses=data?.expenses??[];
-  const months=[2,1,0].map(back=>{const key=monthKey(shift(today,-back*30));const d=new Date(key+"-15T12:00:00");return {key,label:d.toLocaleDateString("pt-BR",{month:"short",timeZone:"America/Sao_Paulo"}),Receitas:appointments.filter(a=>spParts(a.starts_at).date.startsWith(key)).reduce((s,a)=>s+Number(a.price),0),Despesas:expenses.filter(e=>e.expense_date.startsWith(key)).reduce((s,e)=>s+Number(e.amount),0)};});
+  const months=[2,1,0].map(back=>{const key=monthOffset(today,back);const d=new Date(key+"-15T12:00:00");return {key,label:d.toLocaleDateString("pt-BR",{month:"short",timeZone:"America/Sao_Paulo"}),Receitas:appointments.filter(a=>spParts(a.starts_at).date.startsWith(key)).reduce((s,a)=>s+Number(a.price),0),Despesas:expenses.filter(e=>e.expense_date.startsWith(key)).reduce((s,e)=>s+Number(e.amount),0)};});
   const current=months[2]??{key:monthKey(today),Receitas:0,Despesas:0,label:""};
   const result=current.Receitas-current.Despesas;
   const recent=appointments.slice(0,8);

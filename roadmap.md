@@ -39,7 +39,8 @@ As instruções do projeto reservam as alterações de schema ao Lovable. Não e
 ## Pendências de produto e operação
 - [ ] Integrar provedor de cobrança recorrente após definição de provedor e credenciais em Secrets.
 - [ ] Implementar gestão de plano, assinatura, cancelamento, inadimplência e limites por plano.
-- [ ] Aplicar pelo Lovable as tabelas barber_weekly_hours e barber_time_blocks com RLS para o proprietário (ver especificação em docs/disponibilidade-barbercircuit.md).\n- [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).\n- [ ] Conectar as regras de disponibilidade à RPC de agendamento público e validar todos os fluxos no ambiente Supabase real.
+- [ ] Aplicar pelo Lovable as tabelas barber_weekly_hours e barber_time_blocks com RLS para o proprietário (ver especificação em docs/disponibilidade-barbercircuit.md).
+- [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).\n- [ ] Conectar as regras de disponibilidade à RPC de agendamento público e validar todos os fluxos no ambiente Supabase real.
 - [ ] Implementar upload de logotipo com Supabase Storage e políticas de acesso.
 - [ ] Ativar confirmação/lembretes de agendamento por e-mail/WhatsApp conforme provedor escolhido.
 - [ ] Executar testes de integração com uma conta Supabase real, build de produção e lint.

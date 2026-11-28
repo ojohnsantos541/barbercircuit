@@ -17,6 +17,23 @@ export function ShopOnboarding() {
     setLoading(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { setLoading(false); return; }
+
+    // Keep onboarding resilient if the Auth user exists but its profile trigger
+    // did not create the corresponding public.profiles row.
+    const { error: profileError } = await supabase.from("profiles").upsert(
+      {
+        id: u.user.id,
+        full_name: typeof u.user.user_metadata?.full_name === "string"
+          ? u.user.user_metadata.full_name.trim() || null
+          : null,
+      },
+      { onConflict: "id", ignoreDuplicates: true },
+    );
+    if (profileError) {
+      setLoading(false);
+      toast.error("Não foi possível preparar seu perfil. Saia da conta e entre novamente.");
+      return;
+    }
     const { data: existing, error: lookupError } = await supabase.from("barbershops").select("id").eq("owner_user_id", u.user.id).maybeSingle();
     if (lookupError) { setLoading(false); toast.error("Sua conta possui mais de uma barbearia cadastrada. Corrija os registros antes de continuar."); return; }
     if (existing) { setLoading(false); toast.success("Sua barbearia já está cadastrada."); qc.invalidateQueries({ queryKey: myShopQuery.queryKey }); return; }

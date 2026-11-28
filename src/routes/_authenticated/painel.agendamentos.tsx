@@ -68,7 +68,7 @@ function Agenda() {
       </div>
 
       {view === "dia" && (cols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">Cadastre barbeiros para ver a agenda do dia.</div> : (
-        <div className="panel hidden overflow-x-auto md:block">
+        <div className="panel hidden overflow-x-auto lg:block">
           <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${cols.length}, 1fr)` }}>
             <div className="border-b p-3" />
             {cols.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
@@ -83,7 +83,7 @@ function Agenda() {
       ))}
 
       {view === "dia" && cols.length > 0 && (
-        <div className="space-y-3 md:hidden">
+        <div className="space-y-3 lg:hidden">
           {cols.map((b) => {
             const items = byDate(iso(cursor)).filter((a) => a.barber_id === b.id).sort((a, z) => a.time.localeCompare(z.time));
             return <section key={b.id} className="panel p-3">
@@ -96,7 +96,7 @@ function Agenda() {
 
       {view === "semana" && (
         <>
-          <div className="space-y-3 md:hidden">
+          <div className="space-y-3 lg:hidden">
             {week.map((d) => { const k = iso(d); const items = byDate(k); return <section key={k} className="panel p-3">
               <div className={`mb-2 flex items-center justify-between border-b pb-2 ${k === today ? "text-primary" : ""}`}>
                 <span className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</span>
@@ -105,7 +105,7 @@ function Agenda() {
               {items.length ? <div className="space-y-2">{items.map((a) => <Card key={a.id} a={a} />)}</div> : <p className="py-2 text-xs text-muted-foreground">Sem atendimentos.</p>}
             </section>; })}
           </div>
-          <div className="panel hidden overflow-x-auto md:block">
+          <div className="panel hidden overflow-x-auto lg:block">
           <div className="grid min-w-[860px] grid-cols-7">
             {week.map((d) => { const k = iso(d); const items = byDate(k); return (
               <div key={k} className="min-h-96 border-l first:border-l-0">

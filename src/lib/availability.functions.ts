@@ -60,6 +60,7 @@ export const saveBarberWeeklyHour = createServerFn({ method: "POST" }).middlewar
 export const deleteBarberWeeklyHour = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => idSchema.parse(i)).handler(async ({ data, context }) => {
   const shopId = await ownerShop(context);
   const r = await (context.supabase as any).from("barber_weekly_hours").delete().eq("id", data.id).eq("barbershop_id", shopId).select("id").single();
+  if (r.error?.code === "23514") throw new Error(r.error.message || "Existem agendamentos futuros vinculados a este horário.");
   if (r.error) throw new Error("Não foi possível remover o horário.");
   return r.data;
 });

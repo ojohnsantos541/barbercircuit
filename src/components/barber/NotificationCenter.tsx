@@ -16,9 +16,9 @@ type Notice = {
 function describeEvent(eventType: string, record: Record<string, unknown>, oldRecord: Record<string, unknown>) {
   if (eventType === "INSERT") return { title: "Novo agendamento", message: "Um novo atendimento foi adicionado à agenda." };
   if (eventType === "DELETE") return { title: "Agendamento removido", message: "Um atendimento foi excluído da agenda." };
-  if (record.status === "cancelado" && oldRecord.status !== "cancelado") return { title: "Agendamento cancelado", message: "Um atendimento foi cancelado." };
-  if (record.starts_at !== oldRecord.starts_at || record.barber_id !== oldRecord.barber_id) return { title: "Agendamento alterado", message: "O horário ou profissional de um atendimento foi alterado." };
-  if (record.status !== oldRecord.status) return { title: "Status atualizado", message: `O status do atendimento mudou para ${String(record.status ?? "atualizado")}.` };
+  if (record["status"] === "cancelado" && oldRecord["status"] !== "cancelado") return { title: "Agendamento cancelado", message: "Um atendimento foi cancelado." };
+  if (record["starts_at"] !== oldRecord["starts_at"] || record["barber_id"] !== oldRecord["barber_id"]) return { title: "Agendamento alterado", message: "O horário ou profissional de um atendimento foi alterado." };
+  if (record["status"] !== oldRecord["status"]) return { title: "Status atualizado", message: `O status do atendimento mudou para ${String(record["status"] ?? "atualizado")}.` };
   return null;
 }
 
@@ -41,11 +41,11 @@ export function NotificationCenter({ shopId }: { shopId: string }) {
         if (!event) return;
         const record = (payload.new ?? payload.old ?? {}) as Record<string, unknown>;
         const notice: Notice = {
-          id: typeof record.id === "string" ? record.id + "-" + Date.now() : String(Date.now()),
+          id: typeof record["id"] === "string" ? record["id"] + "-" + Date.now() : String(Date.now()),
           title: event.title,
           message: event.message,
           createdAt: new Date().toISOString(),
-          appointmentId: typeof record.id === "string" ? record.id : undefined,
+          ...(typeof record["id"] === "string" ? { appointmentId: record["id"] } : {}),
         };
         setItems((current) => [notice, ...current].slice(0, 30));
         toast(event.title, { description: event.message });

@@ -25,9 +25,8 @@ function Relatorios(){
  const bySvc=services.map(s=>({name:s.name,value:done.filter(a=>a.service_id===s.id).reduce((sum,a)=>sum+Number(a.price),0)})).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
  const byBarber=barbers.map(b=>({name:b.name,value:done.filter(a=>a.barber_id===b.id).reduce((sum,a)=>sum+Number(a.price),0),count:done.filter(a=>a.barber_id===b.id).length})).filter(x=>x.count>0).sort((a,b)=>b.value-a.value);
  const byDay=WD.map((name,i)=>({name,count:appts.filter(a=>a.status!=="cancelado"&&new Date(`${spParts(a.starts_at).date}T12:00:00`).getDay()===i).length}));
- const nonCancelled=appts.filter(a=>a.status!=="confirmado");
- const cancelled=appts.filter(a=>a.status==="cancelado").length;
- const cancelRate=nonCancelled.length?Math.round(cancelled/nonCancelled.length*100):0;
+ const cancelled=month.filter(a=>a.status==="cancelado").length;
+ const cancelRate=month.length?Math.round(cancelled/month.length*100):0;
  return <>
   <PageHeader demo={false} title="Relatórios" subtitle="Indicadores calculados com os dados da sua barbearia"/>
   {error&&<div role="alert" className="panel mb-4 p-4 text-destructive">{error instanceof Error?error.message:"Não foi possível carregar os relatórios."}</div>}

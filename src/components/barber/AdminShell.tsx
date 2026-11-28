@@ -7,7 +7,6 @@ import { useState } from "react";
 import { BarChart3, Calendar, LayoutDashboard, Menu, Scissors, Settings, Users, UserSquare2, Wallet, ExternalLink, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./ui";
-import { getShopData } from "@/lib/demo-data";
 
 const items = [
   { to: "/painel", label: "Dashboard", icon: LayoutDashboard },
@@ -22,15 +21,13 @@ const items = [
 
 function Nav({ onNavigate }: { onNavigate?: () => void }) {
   const path = useRouterState({ select: (r) => r.location.pathname });
-  const { shop: demo } = getShopData();
-  const { data: mine } = useQuery(myShopQuery);
-  const shop = mine ?? demo;
+  const { data: shop } = useQuery(myShopQuery);
   return (
     <div className="flex h-full flex-col">
       <div className="px-5 py-6"><Logo /></div>
       <div className="mx-4 mb-4 rounded-lg border border-sidebar-border bg-sidebar-accent p-3">
         <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Barbearia</div>
-        <div className="font-display text-lg font-semibold text-sidebar-accent-foreground">{shop.name}</div>
+        <div className="font-display text-lg font-semibold text-sidebar-accent-foreground">{shop?.name ?? "Sua barbearia"}</div>
       </div>
       <nav className="flex-1 space-y-1 px-3">
         {items.map(({ to, label, icon: Icon }) => {
@@ -45,10 +42,10 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
         })}
       </nav>
       <div className="p-4">
-        <Link to="/b/$slug" params={{ slug: shop.slug }} onClick={onNavigate}
+        {shop && <Link to="/b/$slug" params={{ slug: shop.slug }} onClick={onNavigate}
           className="flex items-center justify-center gap-2 rounded-lg border border-primary/40 px-3 py-2.5 text-sm text-primary hover:bg-primary/10">
           <ExternalLink className="h-4 w-4" /> Página de agendamento
-        </Link>
+        </Link>}
       </div>
     </div>
   );

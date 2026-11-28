@@ -23,6 +23,7 @@ import { Route as AuthenticatedPainelConfiguracoesRouteImport } from './routes/_
 import { Route as AuthenticatedPainelFinanceiroRouteImport } from './routes/_authenticated/painel.financeiro'
 import { Route as AuthenticatedPainelRelatoriosRouteImport } from './routes/_authenticated/painel.relatorios'
 import { Route as AuthenticatedPainelServicosRouteImport } from './routes/_authenticated/painel.servicos'
+import { Route as AuthenticatedPainelDisponibilidadeRouteImport } from './routes/_authenticated/painel.disponibilidade'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -101,6 +102,12 @@ const AuthenticatedPainelServicosRoute =
     path: '/servicos',
     getParentRoute: () => AuthenticatedPainelRoute,
   } as any)
+const AuthenticatedPainelDisponibilidadeRoute =
+  AuthenticatedPainelDisponibilidadeRouteImport.update({
+    id: '/disponibilidade',
+    path: '/disponibilidade',
+    getParentRoute: () => AuthenticatedPainelRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/painel/disponibilidade': typeof AuthenticatedPainelDisponibilidadeRoute
   '/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesByTo {
@@ -129,6 +137,7 @@ export interface FileRoutesByTo {
   '/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/painel/disponibilidade': typeof AuthenticatedPainelDisponibilidadeRoute
   '/painel': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRoutesById {
@@ -146,6 +155,7 @@ export interface FileRoutesById {
   '/_authenticated/painel/financeiro': typeof AuthenticatedPainelFinanceiroRoute
   '/_authenticated/painel/relatorios': typeof AuthenticatedPainelRelatoriosRoute
   '/_authenticated/painel/servicos': typeof AuthenticatedPainelServicosRoute
+  '/_authenticated/painel/disponibilidade': typeof AuthenticatedPainelDisponibilidadeRoute
   '/_authenticated/painel/': typeof AuthenticatedPainelIndexRoute
 }
 export interface FileRouteTypes {
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/painel/financeiro'
     | '/painel/relatorios'
     | '/painel/servicos'
+    | '/painel/disponibilidade'
     | '/painel/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/painel/financeiro'
     | '/painel/relatorios'
     | '/painel/servicos'
+    | '/painel/disponibilidade'
     | '/painel'
   id:
     | '__root__'
@@ -193,6 +205,7 @@ export interface FileRouteTypes {
     | '/_authenticated/painel/financeiro'
     | '/_authenticated/painel/relatorios'
     | '/_authenticated/painel/servicos'
+    | '/_authenticated/painel/disponibilidade'
     | '/_authenticated/painel/'
   fileRoutesById: FileRoutesById
 }
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPainelServicosRouteImport
       parentRoute: typeof AuthenticatedPainelRoute
     }
+    '/_authenticated/painel/disponibilidade': {
+      id: '/_authenticated/painel/disponibilidade'
+      path: '/disponibilidade'
+      fullPath: '/painel/disponibilidade'
+      preLoaderRoute: typeof AuthenticatedPainelDisponibilidadeRouteImport
+      parentRoute: typeof AuthenticatedPainelRoute
+    }
   }
 }
 
@@ -315,6 +335,7 @@ interface AuthenticatedPainelRouteChildren {
   AuthenticatedPainelFinanceiroRoute: typeof AuthenticatedPainelFinanceiroRoute
   AuthenticatedPainelRelatoriosRoute: typeof AuthenticatedPainelRelatoriosRoute
   AuthenticatedPainelServicosRoute: typeof AuthenticatedPainelServicosRoute
+  AuthenticatedPainelDisponibilidadeRoute: typeof AuthenticatedPainelDisponibilidadeRoute
   AuthenticatedPainelIndexRoute: typeof AuthenticatedPainelIndexRoute
 }
 
@@ -326,6 +347,7 @@ const AuthenticatedPainelRouteChildren: AuthenticatedPainelRouteChildren = {
   AuthenticatedPainelFinanceiroRoute: AuthenticatedPainelFinanceiroRoute,
   AuthenticatedPainelRelatoriosRoute: AuthenticatedPainelRelatoriosRoute,
   AuthenticatedPainelServicosRoute: AuthenticatedPainelServicosRoute,
+  AuthenticatedPainelDisponibilidadeRoute: AuthenticatedPainelDisponibilidadeRoute,
   AuthenticatedPainelIndexRoute: AuthenticatedPainelIndexRoute,
 }
 

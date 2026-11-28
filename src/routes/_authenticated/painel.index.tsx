@@ -6,6 +6,7 @@ import { PageHeader, Panel, StatCard, StatusPill } from "@/components/barber/ui"
 import { dashboardQuery } from "@/lib/dashboard-query";
 import { brl, dateBR } from "@/lib/format";
 import { spParts } from "@/lib/sp-time";
+import { isRecognizedRevenue } from "@/lib/revenue";
 
 export const Route = createFileRoute("/_authenticated/painel/")({
   head: () => ({ meta: [{ title: "Dashboard — BarberCircuit" }, { name: "description", content: "Visão geral dos dados reais da sua barbearia." }, { property: "og:title", content: "Dashboard — BarberCircuit" }, { property: "og:description", content: "Visão geral dos dados reais da sua barbearia." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -25,12 +26,13 @@ function Dashboard() {
   const customers = data?.customerCount ?? 0;
   const todayAppts = appointments.filter((a) => spParts(a.starts_at).date === today).sort((a,b) => a.starts_at.localeCompare(b.starts_at));
   const month = today.slice(0,7);
-  const monthDone = appointments.filter((a) => a.status === "concluido" && spParts(a.starts_at).date.startsWith(month));
+  const nowInstant = new Date().toISOString();
+  const monthDone = appointments.filter((a) => isRecognizedRevenue(a.status, a.starts_at, nowInstant) && spParts(a.starts_at).date.startsWith(month));
   const revenue = monthDone.reduce((sum,a) => sum + Number(a.price), 0);
   const ticket = revenue / Math.max(1, monthDone.length);
   const top = services.map((s) => ({ name: s.name, count: appointments.filter((a) => a.service_id === s.id && a.status !== "cancelado" && spParts(a.starts_at).date.startsWith(month)).length })).sort((a,b) => b.count-a.count).slice(0,6);
   const maxTop = Math.max(1, ...top.map((x) => x.count));
-  const chart = Array.from({length:30},(_,i)=>{ const date=shift(today,i-29); return { day: dateBR(date,{day:"2-digit",month:"2-digit"}), value: appointments.filter((a)=>a.status==="concluido" && spParts(a.starts_at).date===date).reduce((s,a)=>s+Number(a.price),0) }; });
+  const chart = Array.from({length:30},(_,i)=>{ const date=shift(today,i-29); return { day: dateBR(date,{day:"2-digit",month:"2-digit"}), value: appointments.filter((a)=>isRecognizedRevenue(a.status, a.starts_at, nowInstant) && spParts(a.starts_at).date===date).reduce((s,a)=>s+Number(a.price),0) }; });
   const titleDate = new Date().toLocaleDateString("pt-BR",{timeZone:"America/Sao_Paulo",weekday:"long",day:"numeric",month:"long"});
   return (
     <>

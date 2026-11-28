@@ -41,7 +41,8 @@ export const createAppointment = createServerFn({ method: "POST" }).middleware([
   const localStart = data.time;
   const localEndDate = new Date(new Date(starts).getTime() + svc.duration_minutes * 60000);
   const localEndParts = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(localEndDate);
-  if (!(workingHours ?? []).some((h: any) => localStart >= h.start_time.slice(0, 5) && localEndParts <= h.end_time.slice(0, 5))) {
+  const localEndDateKey = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).format(localEndDate);
+  if (localEndDateKey !== data.date || !(workingHours ?? []).some((h: any) => localStart >= h.start_time.slice(0, 5) && localEndParts <= h.end_time.slice(0, 5))) {
     throw new Error("Este horário está fora do expediente configurado para o barbeiro.");
   }
   const { data: blocks, error: blocksError } = await availabilityDb.from("barber_time_blocks")

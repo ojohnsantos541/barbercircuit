@@ -40,12 +40,13 @@ function overlaps(a: string, b: string, c: string, d: string) {
 export const getBarberAvailability = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const shopId = await ownerShop(context);
   const db = context.supabase as any;
+  const now = new Date().toISOString();
   const [hoursResult, blocks, barbersResult] = await Promise.all([
     db.from("barber_weekly_hours").select("id,barber_id,day_of_week,start_time,end_time")
       .eq("barbershop_id", shopId).order("day_of_week").order("start_time"),
     fetchAllRows<TimeBlock>((pageFrom, pageTo) => db.from("barber_time_blocks")
       .select("id,barber_id,starts_at,ends_at,reason")
-      .eq("barbershop_id", shopId).gte("starts_at", new Date().toISOString())
+      .eq("barbershop_id", shopId).gt("ends_at", now)
       .order("starts_at").order("id").range(pageFrom, pageTo) as PromiseLike<PageResult<TimeBlock>>),
     db.from("barbers").select("id,name,active").eq("barbershop_id", shopId).order("name"),
   ]);

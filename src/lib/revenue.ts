@@ -3,5 +3,6 @@ export function isRecognizedRevenue(
   startsAt: string,
   now: string | Date = new Date(),
 ) {
-  return status === "concluido" && new Date(startsAt).getTime() <= new Date(now).getTime();
+  const nowMs = typeof now === "string" ? new Date(now).getTime() : now.getTime();
+  return status === "concluido" && new Date(startsAt).getTime() <= nowMs;
 }

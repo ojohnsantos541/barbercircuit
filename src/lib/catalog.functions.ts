@@ -5,7 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { barberSchema, serviceSchema, deleteCatalogSchema } from "./catalog-schema";
 
 async function ownerShop(supabase: SupabaseClient<Database>, userId: string) {
-  const { data, error } = await supabase.from("barbershops").select("id").eq("owner_user_id", userId).order("created_at").limit(1).maybeSingle();
+  const { data, error } = await supabase.from("barbershops").select("id").eq("owner_user_id", userId).maybeSingle();
   if (error) throw new Error("Não foi possível carregar sua barbearia.");
   return data?.id ?? null;
 }

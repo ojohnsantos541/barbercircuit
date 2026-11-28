@@ -4,7 +4,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { spInstant } from "./sp-time";
 import { fetchAllRows } from "./paginated-query";
 
-const rangeSchema = z.object({ from: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/), to: z.string().regex(/^\\d{4}-\\d{2}-\\d{2}$/) });
+const rangeSchema = z.object({ from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/) });
 
 export const getDashboardData = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

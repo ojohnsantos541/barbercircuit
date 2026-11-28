@@ -20,7 +20,7 @@
 - [x] Central visual de notificações no painel com eventos de agendamento em tempo real (novos, cancelados, alterados e mudanças de status).
 - [x] Solicitação de permissão para notificações do navegador e registro do service worker.
 - [x] Service worker preparado para exibir notificações push recebidas e abrir a agenda ao tocar.
-- [x] Habilitar `appointments` na publicação `supabase_realtime` (entrega no navegador ainda precisa de teste ponta a ponta).
+- [x] Habilitar `appointments` na publicação `supabase_realtime` (entrega no navegador ainda precisa de teste ponta a ponta).\n- [x] Disponibilizar atalhos de WhatsApp para o proprietário enviar confirmação e lembrete com texto preenchido a partir do agendamento.\n- [ ] Integrar envio automático via WhatsApp Business Platform, com templates aprovados, credenciais em Supabase Secrets, fila idempotente e rotina agendada.
 - [ ] Criar tabela `push_subscriptions` com RLS por usuário/barbearia e persistência das inscrições de dispositivos.
 - [ ] Configurar VAPID (chave pública no frontend e chave privada em Supabase Secrets) e Edge Function autenticada para envio Web Push.
 - [ ] Criar tabela de notificações persistentes e gatilhos para histórico durável, incluindo lembretes agendados antes do atendimento.
@@ -48,7 +48,7 @@
 - [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).
 - [x] Conectar a disponibilidade às RPCs públicas e testar uma reserva ponta a ponta em transação revertida (sem criar dados de teste permanentes).
 - [ ] Implementar upload de logotipo com Supabase Storage e políticas de acesso.
-- [ ] Ativar confirmação/lembretes de agendamento por e-mail/WhatsApp conforme provedor escolhido.
+- [ ] Ativar confirmação/lembretes automáticos por WhatsApp Business Platform após configurar conta Meta, número remetente, token de acesso e templates aprovados.
 - [ ] Executar testes de integração com uma conta Supabase real, build de produção e lint.
 - [ ] Configurar domínio, monitoramento, política de privacidade e termos de uso.
 

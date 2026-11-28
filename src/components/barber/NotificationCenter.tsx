@@ -39,8 +39,11 @@ export function NotificationCenter({ shopId }: { shopId: string }) {
     };
 
     void loadNotifications();
+    // Each effect instance needs its own channel: React StrictMode can mount, clean up,
+    // and remount effects immediately during development.
+    const channelId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const channel = supabase
-      .channel(`barbercircuit-notifications-${shopId}`)
+      .channel(`barbercircuit-notifications-${shopId}-${channelId}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "notifications", filter: `barbershop_id=eq.${shopId}` },

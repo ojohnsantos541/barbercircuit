@@ -67,7 +67,7 @@ export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; da
   const appointments = ((dayAppointments.data ?? []) as { barber_id: string | null; status: string; starts_at: string; ends_at: string | null }[]).filter((a) => a.barber_id === f.barber_id && a.status !== "cancelado");
   const blocks = ((availability.data?.blocks ?? []) as { barber_id: string; starts_at: string; ends_at: string }[]).filter((b) => b.barber_id === f.barber_id);
   const availableTimes: string[] = [];
-  if (f.barber_id && f.date && duration > 0 && workingHours.length) {
+  if (f.barber_id && f.date && duration > 0 && workingHours.length && !availability.isError && !dayAppointments.isError) {
     for (const hour of workingHours) {
       for (let minute = minutes(hour.start_time); minute + duration <= minutes(hour.end_time); minute += 15) {
         const time = String(Math.floor(minute / 60)).padStart(2, "0") + ":" + String(minute % 60).padStart(2, "0");
@@ -102,8 +102,8 @@ export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; da
           <div className="space-y-1.5"><Label>Barbeiro</Label><select className={sel} value={f.barber_id} onChange={set("barber_id")}><option value="">Selecione</option>{barbers.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <div className="space-y-1.5"><Label>Data</Label><Input type="date" min={new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" })} value={f.date} onChange={set("date")} /></div>
-          <div className="space-y-1.5"><Label>Horário</Label><select className={sel} value={f.time} onChange={set("time")} disabled={!f.barber_id || !f.service_id || availability.isLoading || dayAppointments.isLoading || availableTimes.length === 0}>
+          <div className="space-y-1.5"><Label>Data</Label><Input type="date" min={spParts(new Date().toISOString()).date} value={f.date} onChange={set("date")} /></div>
+          <div className="space-y-1.5"><Label>Horário</Label><select className={sel} value={f.time} onChange={set("time")} disabled={!f.barber_id || !f.service_id || availability.isLoading || dayAppointments.isLoading || availability.isError || dayAppointments.isError || availableTimes.length === 0}>
             <option value="">{!f.barber_id || !f.service_id ? "Selecione serviço e barbeiro" : availability.isLoading || dayAppointments.isLoading ? "Carregando horários..." : availableTimes.length ? "Selecione um horário" : "Sem horários disponíveis"}</option>
             {availableTimes.map((time) => <option key={time} value={time}>{time}</option>)}
           </select></div>
@@ -113,7 +113,7 @@ export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; da
         {availability.error && <p role="alert" className="text-sm text-destructive">Não foi possível carregar a disponibilidade. Tente novamente.</p>}
         {dayAppointments.error && <p role="alert" className="text-sm text-destructive">Não foi possível verificar os horários ocupados. Tente novamente.</p>}
         <div className="space-y-1.5"><Label>Observações</Label><Textarea value={f.notes} onChange={set("notes")} /></div>
-        <DialogFooter><Button type="submit" disabled={m.isPending || availability.isLoading || dayAppointments.isLoading || !availableTimes.includes(f.time)}>{m.isPending && <Loader2 className="animate-spin" />}Agendar</Button></DialogFooter>
+        <DialogFooter><Button type="submit" disabled={m.isPending || availability.isLoading || dayAppointments.isLoading || availability.isError || dayAppointments.isError || !availableTimes.includes(f.time)}>{m.isPending && <Loader2 className="animate-spin" />}Agendar</Button></DialogFooter>
       </form></DialogContent>
     </Dialog>
   );

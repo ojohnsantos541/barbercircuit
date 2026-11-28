@@ -4,7 +4,7 @@ import { customerIdSchema, customerSchema } from "./customer-schema";
 
 type Ctx = { supabase: import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>; userId: string };
 async function shopOf({ supabase, userId }: Ctx) {
-  const { data, error } = await supabase.from("barbershops").select("id").eq("owner_user_id", userId).order("created_at").limit(1).maybeSingle();
+  const { data, error } = await supabase.from("barbershops").select("id").eq("owner_user_id", userId).maybeSingle();
   if (error) throw new Error("Não foi possível carregar sua barbearia.");
   if (!data) throw new Error("Cadastre sua barbearia primeiro.");
   return data.id;

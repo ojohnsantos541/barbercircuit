@@ -60,12 +60,12 @@ export function NewAppointmentDialog({ trigger, date }: { trigger: ReactNode; da
   const refresh = useRefresh(); const create = useServerFn(createAppointment);
   const m = useMutation({ mutationFn: create, onSuccess: async () => { await refresh(); toast.success("Agendamento criado."); setOpen(false); }, onError: (e) => toast.error(msg(e)) });
   const weekday = f.date ? new Date(f.date + "T12:00:00Z").getUTCDay() : -1;
-  const workingHours = (availability.data?.hours ?? []).filter((h) => h.barber_id === f.barber_id && h.day_of_week === weekday);
+  const workingHours = ((availability.data?.hours ?? []) as { barber_id: string; day_of_week: number; start_time: string; end_time: string }[]).filter((h) => h.barber_id === f.barber_id && h.day_of_week === weekday);
   const duration = Number(selectedService?.duration_minutes ?? 0);
-  const minutes = (value: string) => { const parts = value.slice(0, 5).split(":").map(Number); return parts[0] * 60 + parts[1]; };
+  const minutes = (value: string) => { const [hours = "0", mins = "0"] = value.slice(0, 5).split(":"); return Number(hours) * 60 + Number(mins); };
   const overlaps = (a: string, b: string, c: string, d: string) => new Date(a).getTime() < new Date(d).getTime() && new Date(c).getTime() < new Date(b).getTime();
-  const appointments = (dayAppointments.data ?? []).filter((a) => a.barber_id === f.barber_id && a.status !== "cancelado");
-  const blocks = (availability.data?.blocks ?? []).filter((b) => b.barber_id === f.barber_id);
+  const appointments = ((dayAppointments.data ?? []) as { barber_id: string | null; status: string; starts_at: string; ends_at: string | null }[]).filter((a) => a.barber_id === f.barber_id && a.status !== "cancelado");
+  const blocks = ((availability.data?.blocks ?? []) as { barber_id: string; starts_at: string; ends_at: string }[]).filter((b) => b.barber_id === f.barber_id);
   const availableTimes: string[] = [];
   if (f.barber_id && f.date && duration > 0 && workingHours.length) {
     for (const hour of workingHours) {

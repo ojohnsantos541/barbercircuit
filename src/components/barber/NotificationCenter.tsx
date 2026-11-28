@@ -35,7 +35,8 @@ export function NotificationCenter({ shopId }: { shopId: string }) {
         console.warn("Não foi possível registrar o service worker:", error);
       });
     }
-    const channel = supabase.channel(`barbercircuit-appointments-${shopId}`)
+    const channelId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const channel = supabase.channel(`barbercircuit-appointments-${shopId}-${channelId}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "appointments", filter: `barbershop_id=eq.${shopId}` }, (payload) => {
         const event = describeEvent(payload.eventType, (payload.new ?? {}) as Record<string, unknown>, (payload.old ?? {}) as Record<string, unknown>);
         if (!event) return;

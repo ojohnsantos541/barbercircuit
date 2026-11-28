@@ -54,7 +54,7 @@ function Nav({ onNavigate }: { onNavigate?: () => void }) {
 export function AdminShell() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  const { data: mine, isLoading } = useQuery(myShopQuery);
+  const { data: mine, isLoading, error } = useQuery(myShopQuery);
   async function signOut() {
     await qc.cancelQueries(); qc.clear();
     await supabase.auth.signOut();
@@ -81,7 +81,7 @@ export function AdminShell() {
           <Button size="icon" variant="ghost" aria-label="Sair" className="ml-auto" onClick={signOut}><LogOut className="h-5 w-5" /></Button>
         </header>
         <div className="hidden items-center justify-between border-b px-8 py-3 lg:flex"><Button title={collapsed ? "Expandir menu" : "Recolher menu"} aria-label={collapsed ? "Expandir menu" : "Recolher menu"} size="icon" variant="ghost" onClick={()=>setCollapsed(!collapsed)}><Menu/></Button><div className="flex items-center gap-3"><span className="text-xs text-muted-foreground">{mine?.name ?? "Administrador"}</span><Button size="sm" variant="ghost" onClick={signOut}><LogOut /> Sair</Button></div></div>
-        <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">{isLoading ? null : mine ? <Outlet /> : <ShopOnboarding />}</main>
+        <main className="mx-auto w-full max-w-7xl flex-1 p-4 md:p-8">{isLoading ? null : error ? <div role="alert" className="panel p-6 text-destructive">Não foi possível identificar sua barbearia. Este sistema aceita uma barbearia por conta; solicite a correção de cadastros duplicados antes de continuar.</div> : mine ? <Outlet /> : <ShopOnboarding />}</main>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/barber/ui";
 import { AppointmentDetails, NewAppointmentDialog, type Appt } from "@/components/barber/AppointmentForms";
 import { catalogQuery } from "@/lib/catalog-query";
 import { getAppointments } from "@/lib/appointments.functions";
+import { getBarberAvailability } from "@/lib/availability.functions";
 import { spInstant, spParts } from "@/lib/sp-time";
 
 export const Route = createFileRoute("/_authenticated/painel/agendamentos")({
@@ -29,6 +30,7 @@ function Agenda() {
   const [cursor, setCursor] = useState(() => new Date());
   const { data: appts = [], error } = useQuery(monthQuery(cursor));
   const { data: cat } = useQuery(catalogQuery);
+  const { data: availability, error: availabilityError } = useQuery({ queryKey: ["barber-availability"], queryFn: () => getBarberAvailability() });
   const barbers = cat?.barbers ?? [];
   const list = appts.map((a) => ({ ...a, ...spParts(a.starts_at) })) as (Appt & { date: string; time: string })[];
   const byDate = (d: string) => list.filter((a) => a.date === d);
@@ -37,6 +39,10 @@ function Agenda() {
   const move = (n: number) => { const d = new Date(cursor); if (view === "dia") d.setDate(d.getDate() + n); else if (view === "semana") d.setDate(d.getDate() + 7 * n); else d.setMonth(d.getMonth() + n); setCursor(d); };
   const weekStart = new Date(cursor); weekStart.setDate(cursor.getDate() - cursor.getDay());
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
+  const weeklyHours = availability?.hours ?? [];
+  const hasConfiguredHours = weeklyHours.length > 0;
+  const hasWorkingDay = (date: Date) => weeklyHours.some((h: { barber_id: string; day_of_week: number }) => h.day_of_week === date.getDay() && barbers.some((b) => b.id === h.barber_id && b.active));
+  const agendaWeek = hasConfiguredHours ? week.filter((date) => hasWorkingDay(date) || byDate(iso(date)).length > 0) : week;
   const label = view === "dia" ? cursor.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long" })
     : view === "semana" ? `${(week[0] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} – ${(week[6] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}`
     : cursor.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
@@ -48,50 +54,79 @@ function Agenda() {
       </button>} />
   );
   const cols = barbers.filter((b) => b.active || list.some((a) => a.barber_id === b.id));
+  const dayCols = hasConfiguredHours ? cols.filter((b) => weeklyHours.some((h: { barber_id: string; day_of_week: number }) => h.barber_id === b.id && h.day_of_week === cursor.getDay()) || byDate(iso(cursor)).some((a) => a.barber_id === b.id)) : cols;
 
   return (
     <>
       <PageHeader demo={false} title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<NewAppointmentDialog date={iso(cursor)} trigger={<Button><Plus /> Novo agendamento</Button>} />} />
       {error && <div role="alert" className="panel mb-4 p-4 text-destructive">{error.message}</div>}
+      {availabilityError && <div role="alert" className="panel mb-4 p-4 text-destructive">Não foi possível carregar os dias disponíveis. {availabilityError.message}</div>}
+      {hasConfiguredHours && <p className="mb-3 text-xs text-muted-foreground">A agenda considera os dias de expediente cadastrados em Disponibilidade. Dias sem expediente ficam ocultos, exceto quando já possuem atendimentos.</p>}
+      {!availability && !availabilityError && <p className="mb-3 text-xs text-muted-foreground">Carregando os dias de expediente...</p>}
+      {availability && !hasConfiguredHours && <p className="mb-3 text-xs text-amber-700">Nenhum expediente semanal configurado. Cadastre os dias e horários em Disponibilidade para sincronizar a agenda.</p>}
       <div className="panel mb-4 flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-1.5 sm:gap-2">
           <Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Anterior"><ChevronLeft /></Button>
           <Button size="sm" variant="outline" onClick={() => setCursor(new Date())}>Hoje</Button>
           <Button size="icon" variant="ghost" onClick={() => move(1)} aria-label="Próximo"><ChevronRight /></Button>
-          <span className="ml-2 font-display text-xl capitalize">{label}</span>
+          <span className="ml-1 min-w-0 flex-1 truncate font-display text-lg capitalize sm:ml-2 sm:text-xl">{label}</span>
         </div>
-        <div className="flex rounded-lg bg-secondary p-1">
+        <div className="flex w-full rounded-lg bg-secondary p-1 sm:w-auto">
           {(["dia", "semana", "mes"] as View[]).map((v) => (
-            <button key={v} onClick={() => setView(v)} className={`flex-1 rounded-md px-4 py-1.5 text-sm ${view === v ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground"}`}>{v === "dia" ? "Dia" : v === "semana" ? "Semana" : "Mês"}</button>
+            <button key={v} onClick={() => setView(v)} className={`min-h-10 flex-1 rounded-md px-3 py-1.5 text-sm sm:px-4 ${view === v ? "bg-primary text-primary-foreground font-semibold" : "text-muted-foreground"}`}>{v === "dia" ? "Dia" : v === "semana" ? "Semana" : "Mês"}</button>
           ))}
         </div>
       </div>
 
-      {view === "dia" && (cols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">Cadastre barbeiros para ver a agenda do dia.</div> : (
-        <div className="panel overflow-x-auto">
-          <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${cols.length}, 1fr)` }}>
+      {view === "dia" && (dayCols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">{hasConfiguredHours ? "Nenhum barbeiro tem expediente configurado para este dia. Confira a tela Disponibilidade." : "Cadastre barbeiros para ver a agenda do dia."}</div> : (
+        <div className="panel hidden overflow-x-auto lg:block">
+          <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${dayCols.length}, 1fr)` }}>
             <div className="border-b p-3" />
-            {cols.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
+            {dayCols.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
             {HOURS.map((h) => (
               <div key={h} className="contents">
                 <div className="border-b p-3 text-xs text-muted-foreground">{h}:00</div>
-                {cols.map((b) => <div key={b.id} className="min-h-16 space-y-1 border-b border-l p-1.5">{byDate(iso(cursor)).filter((x) => x.barber_id === b.id && x.time.startsWith(h)).map((a) => <Card key={a.id} a={a} />)}</div>)}
+                {dayCols.map((b) => <div key={b.id} className="min-h-16 space-y-1 border-b border-l p-1.5">{byDate(iso(cursor)).filter((x) => x.barber_id === b.id && x.time.startsWith(h)).map((a) => <Card key={a.id} a={a} />)}</div>)}
               </div>
             ))}
           </div>
         </div>
       ))}
 
+      {view === "dia" && dayCols.length > 0 && (
+        <div className="space-y-3 lg:hidden">
+          {dayCols.map((b) => {
+            const items = byDate(iso(cursor)).filter((a) => a.barber_id === b.id).sort((a, z) => a.time.localeCompare(z.time));
+            return <section key={b.id} className="panel p-3">
+              <h3 className="mb-2 text-sm font-semibold">{b.name}</h3>
+              {items.length ? <div className="space-y-2">{items.map((a) => <Card key={a.id} a={a} />)}</div> : <p className="py-2 text-xs text-muted-foreground">Sem atendimentos neste dia.</p>}
+            </section>;
+          })}
+        </div>
+      )}
+
       {view === "semana" && (
-        <div className="panel overflow-x-auto">
-          <div className="grid min-w-[860px] grid-cols-7">
-            {week.map((d) => { const k = iso(d); const items = byDate(k); return (
+        <>
+          {agendaWeek.length === 0 && <div className="panel p-6 text-center text-sm text-muted-foreground">Não há dias de expediente configurados para os barbeiros ativos nesta semana. Confira a tela Disponibilidade.</div>}
+          <div className={agendaWeek.length === 0 ? "hidden" : "space-y-3 lg:hidden"}>
+            {agendaWeek.map((d) => { const k = iso(d); const items = byDate(k); return <section key={k} className="panel p-3">
+              <div className={`mb-2 flex items-center justify-between border-b pb-2 ${k === today ? "text-primary" : ""}`}>
+                <span className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</span>
+                <span className="font-display text-xl">{d.toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}</span>
+              </div>
+              {items.length ? <div className="space-y-2">{items.map((a) => <Card key={a.id} a={a} />)}</div> : <p className="py-2 text-xs text-muted-foreground">Sem atendimentos.</p>}
+            </section>; })}
+          </div>
+          <div className="panel hidden overflow-x-auto lg:block">
+          <div className="grid min-w-[860px]" style={{ gridTemplateColumns: `repeat(${agendaWeek.length}, minmax(120px, 1fr))` }}>
+            {agendaWeek.map((d) => { const k = iso(d); const items = byDate(k); return (
               <div key={k} className="min-h-96 border-l first:border-l-0">
                 <div className={`border-b p-3 text-center ${k === today ? "text-primary" : ""}`}><div className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</div><div className="font-display text-2xl">{d.getDate()}</div></div>
                 <div className="space-y-1.5 p-1.5">{items.map((a) => <Card key={a.id} a={a} />)}</div>
               </div>); })}
           </div>
-        </div>
+          </div>
+        </>
       )}
 
       {view === "mes" && (() => {

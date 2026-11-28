@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { apptIdSchema, newAppointmentSchema, rangeSchema, statusSchema } from "./appointment-schema";
 import { overlaps, spInstant } from "./sp-time";
+import { fetchAllRows } from "./paginated-query";
 
 type Ctx = { supabase: import("@supabase/supabase-js").SupabaseClient<import("@/integrations/supabase/types").Database>; userId: string };
 async function shopOf({ supabase, userId }: Ctx) {
@@ -13,11 +14,14 @@ async function shopOf({ supabase, userId }: Ctx) {
 
 export const getAppointments = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => rangeSchema.parse(i)).handler(async ({ data, context }) => {
   const shopId = await shopOf(context);
-  const { data: rows, error } = await context.supabase.from("appointments")
-    .select("id, starts_at, ends_at, status, price, notes, barber_id, customers!appointments_customer_id_fkey(name,phone), services!appointments_service_id_fkey(name)")
-    .eq("barbershop_id", shopId).gte("starts_at", data.from).lt("starts_at", data.to).order("starts_at").limit(1000);
-  if (error) throw new Error("Não foi possível carregar a agenda.");
-  return rows;
+  try {
+    return await fetchAllRows((pageFrom, pageTo) => context.supabase.from("appointments")
+      .select("id, starts_at, ends_at, status, price, notes, barber_id, customers!appointments_customer_id_fkey(name,phone), services!appointments_service_id_fkey(name)")
+      .eq("barbershop_id", shopId).gte("starts_at", data.from).lt("starts_at", data.to)
+      .order("starts_at").order("id").range(pageFrom, pageTo));
+  } catch {
+    throw new Error("Não foi possível carregar a agenda.");
+  }
 });
 
 export const createAppointment = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => newAppointmentSchema.parse(i)).handler(async ({ data, context }) => {

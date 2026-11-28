@@ -1,11 +1,13 @@
-import { DemoAction } from "@/components/barber/DemoAction";
 import { createFileRoute } from "@tanstack/react-router";
+import { keepPreviousData, queryOptions, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/barber/ui";
-import { getShopData, toISO, todayISO, type Appointment } from "@/lib/demo-data";
-import { dateBR } from "@/lib/format";
+import { AppointmentDetails, NewAppointmentDialog, type Appt } from "@/components/barber/AppointmentForms";
+import { catalogQuery } from "@/lib/catalog-query";
+import { getAppointments } from "@/lib/appointments.functions";
+import { spInstant, spParts } from "@/lib/sp-time";
 
 export const Route = createFileRoute("/_authenticated/painel/agendamentos")({
   head: () => ({ meta: [{ title: "Agendamentos — BarberPro" }, { name: "description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:title", content: "Agendamentos — BarberPro" }, { property: "og:description", content: "Calendário diário, semanal e mensal dos atendimentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -13,16 +15,25 @@ export const Route = createFileRoute("/_authenticated/painel/agendamentos")({
 });
 
 type View = "dia" | "semana" | "mes";
-const HOURS = ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"];
+const HOURS = ["08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"];
 const WD = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const iso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+function monthQuery(cursor: Date) {
+  const start = new Date(cursor.getFullYear(), cursor.getMonth(), 1 - 7); const end = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 8);
+  return queryOptions({ queryKey: ["owner-appointments", iso(start)], queryFn: () => getAppointments({ data: { from: spInstant(iso(start), "00:00"), to: spInstant(iso(end), "00:00") } }), placeholderData: keepPreviousData });
+}
 
 function Agenda() {
-  const data = getShopData();
   const [view, setView] = useState<View>("dia");
   const [cursor, setCursor] = useState(() => new Date());
-  const byDate = (iso: string) => data.appointments.filter((a) => a.date === iso);
-  const svc = (id: string) => data.services.find((s) => s.id === id)?.name ?? "";
-  const cli = (id: string) => data.clients.find((c) => c.id === id)?.name ?? "";
+  const { data: appts = [], error } = useQuery(monthQuery(cursor));
+  const { data: cat } = useQuery(catalogQuery);
+  const barbers = cat?.barbers ?? [];
+  const list = appts.map((a) => ({ ...a, ...spParts(a.starts_at) })) as (Appt & { date: string; time: string })[];
+  const byDate = (d: string) => list.filter((a) => a.date === d);
+  const bName = (id: string | null) => barbers.find((b) => b.id === id)?.name ?? "Barbeiro removido";
+  const today = iso(new Date());
   const move = (n: number) => { const d = new Date(cursor); if (view === "dia") d.setDate(d.getDate() + n); else if (view === "semana") d.setDate(d.getDate() + 7 * n); else d.setMonth(d.getMonth() + n); setCursor(d); };
   const weekStart = new Date(cursor); weekStart.setDate(cursor.getDate() - cursor.getDay());
   const week = Array.from({ length: 7 }, (_, i) => { const d = new Date(weekStart); d.setDate(weekStart.getDate() + i); return d; });
@@ -30,15 +41,18 @@ function Agenda() {
     : view === "semana" ? `${(week[0] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })} – ${(week[6] ?? cursor).toLocaleDateString("pt-BR", { day: "numeric", month: "short" })}`
     : cursor.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
 
-  const Card = ({ a }: { a: Appointment }) => (
-    <div className={`rounded-md border-l-2 bg-secondary px-2 py-1.5 text-xs ${a.status === "cancelado" ? "border-destructive opacity-50" : "border-primary"}`}>
-      <div className="truncate font-medium">{cli(a.clientId)}</div><div className="truncate text-muted-foreground">{svc(a.serviceId)}</div>
-    </div>
+  const Card = ({ a }: { a: Appt & { time: string } }) => (
+    <AppointmentDetails a={a} barberName={bName(a.barber_id)} trigger={
+      <button className={`block w-full rounded-md border-l-2 bg-secondary px-2 py-1.5 text-left text-xs hover:bg-accent ${a.status === "cancelado" ? "border-destructive opacity-50" : a.status === "concluido" ? "border-success" : "border-primary"}`}>
+        <div className="truncate font-medium"><span className="text-primary">{a.time}</span> {a.customers?.name ?? "—"}</div><div className="truncate text-muted-foreground">{a.services?.name ?? ""}</div>
+      </button>} />
   );
+  const cols = barbers.filter((b) => b.active || list.some((a) => a.barber_id === b.id));
 
   return (
     <>
-      <PageHeader title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<DemoAction title="Novo agendamento" fields={["Cliente", "Serviço", "Barbeiro", "Data", "Horário"]} />} />
+      <PageHeader demo={false} title="Agendamentos" subtitle="Acompanhe a agenda de toda a equipe" action={<NewAppointmentDialog date={iso(cursor)} trigger={<Button><Plus /> Novo agendamento</Button>} />} />
+      {error && <div role="alert" className="panel mb-4 p-4 text-destructive">{error.message}</div>}
       <div className="panel mb-4 flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <Button size="icon" variant="ghost" onClick={() => move(-1)} aria-label="Anterior"><ChevronLeft /></Button>
@@ -53,28 +67,28 @@ function Agenda() {
         </div>
       </div>
 
-      {view === "dia" && (
+      {view === "dia" && (cols.length === 0 ? <div className="panel p-10 text-center text-muted-foreground">Cadastre barbeiros para ver a agenda do dia.</div> : (
         <div className="panel overflow-x-auto">
-          <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${data.barbers.length}, 1fr)` }}>
+          <div className="grid min-w-[640px]" style={{ gridTemplateColumns: `70px repeat(${cols.length}, 1fr)` }}>
             <div className="border-b p-3" />
-            {data.barbers.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
+            {cols.map((b) => <div key={b.id} className="border-b border-l p-3 text-sm font-semibold">{b.name}</div>)}
             {HOURS.map((h) => (
               <div key={h} className="contents">
-                <div className="border-b p-3 text-xs text-muted-foreground">{h}</div>
-                {data.barbers.map((b) => { const a = byDate(toISO(cursor)).find((x) => x.barberId === b.id && x.time === h); return <div key={b.id} className="min-h-16 border-b border-l p-1.5">{a && <Card a={a} />}</div>; })}
+                <div className="border-b p-3 text-xs text-muted-foreground">{h}:00</div>
+                {cols.map((b) => <div key={b.id} className="min-h-16 space-y-1 border-b border-l p-1.5">{byDate(iso(cursor)).filter((x) => x.barber_id === b.id && x.time.startsWith(h)).map((a) => <Card key={a.id} a={a} />)}</div>)}
               </div>
             ))}
           </div>
         </div>
-      )}
+      ))}
 
       {view === "semana" && (
         <div className="panel overflow-x-auto">
           <div className="grid min-w-[860px] grid-cols-7">
-            {week.map((d) => { const iso = toISO(d); const list = byDate(iso).sort((a, b) => a.time.localeCompare(b.time)); return (
-              <div key={iso} className="min-h-96 border-l first:border-l-0">
-                <div className={`border-b p-3 text-center ${iso === todayISO() ? "text-primary" : ""}`}><div className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</div><div className="font-display text-2xl">{d.getDate()}</div></div>
-                <div className="space-y-1.5 p-1.5">{list.slice(0, 10).map((a) => <div key={a.id}><div className="mb-0.5 text-[10px] text-primary">{a.time}</div><Card a={a} /></div>)}{list.length > 10 && <div className="text-center text-xs text-muted-foreground">+{list.length - 10}</div>}</div>
+            {week.map((d) => { const k = iso(d); const items = byDate(k); return (
+              <div key={k} className="min-h-96 border-l first:border-l-0">
+                <div className={`border-b p-3 text-center ${k === today ? "text-primary" : ""}`}><div className="text-xs uppercase text-muted-foreground">{WD[d.getDay()]}</div><div className="font-display text-2xl">{d.getDate()}</div></div>
+                <div className="space-y-1.5 p-1.5">{items.map((a) => <Card key={a.id} a={a} />)}</div>
               </div>); })}
           </div>
         </div>
@@ -87,16 +101,16 @@ function Agenda() {
           <div className="panel overflow-hidden">
             <div className="grid grid-cols-7 border-b">{WD.map((w) => <div key={w} className="p-2 text-center text-xs uppercase text-muted-foreground">{w}</div>)}</div>
             <div className="grid grid-cols-7">
-              {cells.map((d) => { const iso = toISO(d); const n = byDate(iso).filter((a) => a.status !== "cancelado").length; const inMonth = d.getMonth() === cursor.getMonth(); return (
-                <button key={iso} onClick={() => { setCursor(d); setView("dia"); }} className={`min-h-16 border-b border-l p-2 text-left transition-colors hover:bg-accent md:min-h-24 ${inMonth ? "" : "opacity-30"}`}>
-                  <div className={`text-sm ${iso === todayISO() ? "font-bold text-primary" : ""}`}>{d.getDate()}</div>
+              {cells.map((d) => { const k = iso(d); const n = byDate(k).filter((a) => a.status !== "cancelado").length; const inMonth = d.getMonth() === cursor.getMonth(); return (
+                <button key={k} onClick={() => { setCursor(d); setView("dia"); }} className={`min-h-16 border-b border-l p-2 text-left transition-colors hover:bg-accent md:min-h-24 ${inMonth ? "" : "opacity-30"}`}>
+                  <div className={`text-sm ${k === today ? "font-bold text-primary" : ""}`}>{d.getDate()}</div>
                   {n > 0 && <div className="mt-1 inline-block rounded bg-primary/15 px-1.5 text-[10px] text-primary md:text-xs">{n}<span className="hidden md:inline"> agend.</span></div>}
                 </button>); })}
             </div>
           </div>
         );
       })()}
-      <p className="mt-3 text-xs text-muted-foreground">{dateBR(todayISO(), { day: "2-digit", month: "long" })} — clique em um dia no mês para ver detalhes.</p>
+      <p className="mt-3 text-xs text-muted-foreground">Horários no fuso de São Paulo. Clique em um atendimento para mudar o status ou excluir.</p>
     </>
   );
 }

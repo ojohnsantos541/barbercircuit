@@ -7,4 +7,5 @@
 - [x] Conectar Serviços e Barbeiros: cadastrar, editar, ativar/desativar e excluir.
 - [ ] Verificar cadastros na conta autenticada (acesso de teste indisponível para Supabase externo).
 - [x] Conectar Clientes: cadastrar, editar, buscar, excluir e histórico.
+- [ ] Conectar Agendamentos: criar, mudar status, excluir e evitar conflito de horário.
 - [ ] Ligar as demais telas do painel aos dados reais.

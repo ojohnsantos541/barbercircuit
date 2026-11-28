@@ -436,6 +436,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_public_booking: {
+        Args: {
+          _barber_id: string
+          _customer_name: string
+          _customer_phone: string
+          _date: string
+          _service_id: string
+          _slug: string
+          _time: string
+        }
+        Returns: {
+          appointment_id: string
+          barber_name: string
+          ends_at: string
+          price: number
+          service_name: string
+          starts_at: string
+        }[]
+      }
       get_public_barbershop_by_slug: {
         Args: { _slug: string }
         Returns: {
@@ -444,6 +463,17 @@ export type Database = {
           name: string
           phone: string
           slug: string
+        }[]
+      }
+      get_public_booking_slots: {
+        Args: {
+          _barber_id: string
+          _date: string
+          _service_id: string
+          _slug: string
+        }
+        Returns: {
+          slot_time: string
         }[]
       }
       is_shop_owner: { Args: { _shop: string }; Returns: boolean }

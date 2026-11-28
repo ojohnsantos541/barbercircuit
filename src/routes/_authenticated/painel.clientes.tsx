@@ -10,7 +10,7 @@ import { customersQuery } from "@/lib/customers-query";
 import { brl, dateBR } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/painel/clientes")({
-  head: () => ({ meta: [{ title: "Clientes — BarberPro" }, { name: "description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:title", content: "Clientes — BarberPro" }, { property: "og:description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Clientes — BarberCircuit" }, { name: "description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:title", content: "Clientes — BarberCircuit" }, { property: "og:description", content: "Cadastro de clientes com telefone e histórico de agendamentos." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   loader: ({ context }) => { void context.queryClient.ensureQueryData(customersQuery); },
   component: Clientes,
   errorComponent: ({ error }) => <div role="alert" className="panel p-6 text-destructive">{error instanceof Error ? error.message : "Não foi possível carregar."}</div>,

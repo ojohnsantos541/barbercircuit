@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { myShopQuery } from "@/lib/my-shop";
 import { ShopOnboarding } from "./ShopOnboarding";
 import { useState } from "react";
-import { BarChart3, Calendar, LayoutDashboard, Menu, Scissors, Settings, Users, UserSquare2, Wallet, ExternalLink, X, LogOut } from "lucide-react";
+import { BarChart3, Calendar, CalendarClock, LayoutDashboard, Menu, Scissors, Settings, Users, UserSquare2, Wallet, ExternalLink, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "./ui";
 import { NotificationCenter } from "./NotificationCenter";
@@ -15,6 +15,7 @@ const items = [
   { to: "/painel/clientes", label: "Clientes", icon: Users },
   { to: "/painel/servicos", label: "Serviços", icon: Scissors },
   { to: "/painel/barbeiros", label: "Barbeiros", icon: UserSquare2 },
+  { to: "/painel/disponibilidade", label: "Disponibilidade", icon: CalendarClock },
   { to: "/painel/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/painel/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/painel/configuracoes", label: "Configurações", icon: Settings },

@@ -44,7 +44,7 @@ export function Logo({ size = "md" }: { size?: "md" | "lg" }) {
   return (
     <span className="flex items-center gap-2">
       <span className={`grid place-items-center rounded-lg bg-gold font-display font-bold text-primary-foreground ${size === "lg" ? "h-11 w-11 text-xl" : "h-9 w-9 text-lg"}`}>B</span>
-      <span className={`font-display font-semibold ${size === "lg" ? "text-2xl" : "text-xl"}`}>Barber<span className="text-gold">Pro</span></span>
+      <span className={`font-display font-semibold ${size === "lg" ? "text-2xl" : "text-xl"}`}>Barber<span className="text-gold">Circuit</span></span>
     </span>
   );
 }

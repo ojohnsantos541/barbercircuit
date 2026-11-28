@@ -17,6 +17,9 @@ export function ShopOnboarding() {
     setLoading(true);
     const { data: u } = await supabase.auth.getUser();
     if (!u.user) { setLoading(false); return; }
+    const { data: existing, error: lookupError } = await supabase.from("barbershops").select("id").eq("owner_user_id", u.user.id).maybeSingle();
+    if (lookupError) { setLoading(false); toast.error("Sua conta possui mais de uma barbearia cadastrada. Corrija os registros antes de continuar."); return; }
+    if (existing) { setLoading(false); toast.success("Sua barbearia já está cadastrada."); qc.invalidateQueries({ queryKey: myShopQuery.queryKey }); return; }
     const base = slugify(name) || "barbearia";
     let error = null;
     for (let i = 0; i < 4; i++) {

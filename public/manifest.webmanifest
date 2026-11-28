@@ -1,0 +1,13 @@
+{
+  "name": "BarberCircuit",
+  "short_name": "BarberCircuit",
+  "description": "Gestão e agenda da sua barbearia.",
+  "start_url": "/painel",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#171715",
+  "theme_color": "#171715",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "any", "type": "image/x-icon" }
+  ]
+}

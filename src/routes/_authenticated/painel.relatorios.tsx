@@ -5,6 +5,7 @@ import { PageHeader, Panel } from "@/components/barber/ui";
 import { dashboardQuery } from "@/lib/dashboard-query";
 import { brl } from "@/lib/format";
 import { spParts } from "@/lib/sp-time";
+import { isRecognizedRevenue } from "@/lib/revenue";
 
 export const Route = createFileRoute("/_authenticated/painel/relatorios")({
   head: () => ({ meta: [{ title: "Relatórios — BarberCircuit" }, { name: "description", content: "Indicadores calculados a partir dos agendamentos reais." }, { property: "og:title", content: "Relatórios — BarberCircuit" }, { property: "og:description", content: "Indicadores calculados a partir dos agendamentos reais." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
@@ -20,7 +21,8 @@ function Relatorios(){
  const {data,isPending,error}=useQuery(dashboardQuery(`${year}-01-01`,`${Number(year)+1}-01-01`));
  const appts=data?.appointments??[],services=data?.services??[],barbers=data?.barbers??[];
  const month=appts.filter(a=>spParts(a.starts_at).date.startsWith(now.slice(0,7)));
- const done=month.filter(a=>a.status==="concluido");
+ const nowInstant=new Date().toISOString();
+ const done=month.filter(a=>isRecognizedRevenue(a.status,a.starts_at,nowInstant));
  const revenue=done.reduce((s,a)=>s+Number(a.price),0);
  const bySvc=services.map(s=>({name:s.name,value:done.filter(a=>a.service_id===s.id).reduce((sum,a)=>sum+Number(a.price),0)})).filter(x=>x.value>0).sort((a,b)=>b.value-a.value);
  const byBarber=barbers.map(b=>({name:b.name,value:done.filter(a=>a.barber_id===b.id).reduce((sum,a)=>sum+Number(a.price),0),count:done.filter(a=>a.barber_id===b.id).length})).filter(x=>x.count>0).sort((a,b)=>b.value-a.value);

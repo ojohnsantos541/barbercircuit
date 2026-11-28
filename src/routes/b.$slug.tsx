@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { CalendarDays, CheckCircle2, Clock3, MapPin, Phone, Scissors, Users } from "lucide-react";
@@ -102,7 +102,7 @@ function PublicBarbershop() {
     refetchOnWindowFocus: true,
   });
 
-  async function handleBooking(event: React.FormEvent<HTMLFormElement>) {
+  async function handleBooking(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBookingError("");
     setSubmitting(true);

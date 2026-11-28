@@ -8,7 +8,7 @@ import { catalogQuery } from "@/lib/catalog-query";
 import { brl } from "@/lib/format";
 
 export const Route = createFileRoute("/_authenticated/painel/servicos")({
-  head: () => ({ meta: [{ title: "Serviços — BarberPro" }, { name: "description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:title", content: "Serviços — BarberPro" }, { property: "og:description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Serviços — BarberCircuit" }, { name: "description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:title", content: "Serviços — BarberCircuit" }, { property: "og:description", content: "Cadastro de serviços com descrição, preço e duração." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   loader: ({ context }) => { void context.queryClient.ensureQueryData(catalogQuery); },
   component: Servicos,
   errorComponent: ({ error }) => <div role="alert" className="panel p-6 text-destructive">{error instanceof Error ? error.message : "Não foi possível carregar."}</div>,

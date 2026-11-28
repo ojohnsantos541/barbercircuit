@@ -26,6 +26,7 @@ function useRefresh() {
     await Promise.all([
       qc.invalidateQueries({ queryKey: ["owner-appointments"] }),
       qc.invalidateQueries({ queryKey: ["owner-dashboard"] }),
+      qc.invalidateQueries({ queryKey: ["owner-financial"] }),
     ]);
   };
 }

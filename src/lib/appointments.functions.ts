@@ -37,7 +37,7 @@ export const createAppointment = createServerFn({ method: "POST" }).middleware([
   const weekday = new Date(`${data.date}T12:00:00Z`).getUTCDay();
   const { data: workingHours, error: hoursError } = await availabilityDb.from("barber_weekly_hours")
     .select("start_time,end_time").eq("barbershop_id", shopId).eq("barber_id", data.barber_id).eq("day_of_week", weekday);
-  if (hoursError) throw new Error("Não foi possível validar o expediente do barbeiro.");
+  if (hoursError) throw new Error("Não foi possível validar o expediente do barbeiro. Verifique a configuração de disponibilidade no Supabase.");
   const localStart = data.time;
   const localEndDate = new Date(new Date(starts).getTime() + svc.duration_minutes * 60000);
   const localEndParts = new Intl.DateTimeFormat("en-GB", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(localEndDate);
@@ -52,9 +52,22 @@ export const createAppointment = createServerFn({ method: "POST" }).middleware([
   if ((blocks ?? []).some((b: any) => overlaps(starts, ends, b.starts_at, b.ends_at))) {
     throw new Error("O barbeiro está indisponível neste horário.");
   }
-  const dayStart = new Date(new Date(starts).getTime() - 24 * 3600000).toISOString();
-  const { data: same } = await context.supabase.from("appointments").select("starts_at, ends_at").eq("barbershop_id", shopId).eq("barber_id", data.barber_id).neq("status", "cancelado").gte("starts_at", dayStart).lt("starts_at", ends);
-  if ((same ?? []).some((a) => overlaps(starts, ends, a.starts_at, a.ends_at ?? a.starts_at))) throw new Error("Este barbeiro já tem um atendimento nesse horário.");
+
+  // Use interval overlap in the database query, not only appointment start time.
+  // A previous appointment may begin before this one and still extend into it.
+  const { data: conflictingAppointments, error: conflictError } = await context.supabase
+    .from("appointments")
+    .select("starts_at, ends_at")
+    .eq("barbershop_id", shopId)
+    .eq("barber_id", data.barber_id)
+    .neq("status", "cancelado")
+    .lt("starts_at", ends)
+    .gt("ends_at", starts);
+  if (conflictError) throw new Error("Não foi possível verificar conflitos na agenda. Tente novamente.");
+  if ((conflictingAppointments ?? []).some((a) => overlaps(starts, ends, a.starts_at, a.ends_at ?? a.starts_at))) {
+    throw new Error("Este barbeiro já tem um atendimento nesse horário.");
+  }
+
   const r = await context.supabase.from("appointments").insert({ barbershop_id: shopId, customer_id: data.customer_id, service_id: data.service_id, barber_id: data.barber_id, starts_at: starts, ends_at: ends, price: svc.price, notes: data.notes || null }).select("id").single();
   if (r.error) throw new Error("Não foi possível salvar o agendamento.");
   return r.data;

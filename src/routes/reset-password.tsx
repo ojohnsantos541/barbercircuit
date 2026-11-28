@@ -9,10 +9,10 @@ import { isRecoveryHash, RECOVERY_EVENT, RECOVERY_STORAGE_KEY, validateNewPasswo
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
-    { title: "Redefinir senha — BarberPro" },
-    { name: "description", content: "Crie uma nova senha para acessar sua conta BarberPro com segurança." },
-    { property: "og:title", content: "Redefinir senha — BarberPro" },
-    { property: "og:description", content: "Recupere o acesso à sua conta BarberPro." },
+    { title: "Redefinir senha — BarberCircuit" },
+    { name: "description", content: "Crie uma nova senha para acessar sua conta BarberCircuit com segurança." },
+    { property: "og:title", content: "Redefinir senha — BarberCircuit" },
+    { property: "og:description", content: "Recupere o acesso à sua conta BarberCircuit." },
     { property: "og:type", content: "website" },
     { name: "twitter:card", content: "summary" },
   ] }),

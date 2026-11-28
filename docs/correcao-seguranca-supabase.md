@@ -1,86 +1,30 @@
-# Correção coordenada de segurança — barbershops
+# Segurança do Supabase — BarberCircuit
 
-**Aplicar pelo Lovable/Supabase. Não executar a remoção do SELECT anônimo antes de atualizar e publicar a rota pública `/b/$slug` para usar a RPC descrita abaixo.** A página pública atual consulta `barbershops` diretamente; revogar o acesso antes dessa adaptação quebra as páginas públicas.
+## Estado aplicado no projeto Supabase
 
-## 1. Pré-verificação obrigatória
+As correções abaixo foram aplicadas diretamente ao projeto Barbercircuit em 28/11/2026 e verificadas por consultas SQL e pelos Database Advisors.
 
-Execute primeiro:
+- A rota pública `/b/$slug` consulta a RPC `get_public_barbershop_by_slug`.
+- A RPC retorna apenas `id`, `name`, `slug`, `address` e `phone`; não retorna `owner_user_id`.
+- A função usa `SECURITY DEFINER`, `search_path = ''` e consulta somente o slug exato. A execução é concedida somente a `anon`, pois a página pública usa a chave publicável.
+- A política ampla `Public can view barbershops` foi removida.
+- Leitura direta de `barbershops` foi revogada para `anon`; usuários autenticados leem somente a própria loja.
+- Foi criada unicidade em `barbershops.owner_user_id`. A pré-verificação não encontrou duplicidades.
+- A função `is_shop_owner` passou para `SECURITY INVOKER`, com execução restrita a `authenticated`.
+- Foram adicionadas chaves estrangeiras compostas para impedir que agendamentos relacionem barbeiros, clientes ou serviços de outra barbearia.
+- Foram adicionados índices de suporte e políticas RLS específicas.
 
-```sql
-select owner_user_id, count(*) as total, array_agg(id) as barbershop_ids
-from public.barbershops
-group by owner_user_id
-having count(*) > 1;
-```
+## Verificações realizadas
 
-Se retornar linhas, interrompa. Analise cada conta e decida manualmente qual registro deve permanecer. Não exclua nem mescle dados automaticamente.
+- A chamada da RPC como `anon` retornou somente os campos públicos esperados.
+- A consulta direta a `barbershops` como `anon` foi negada por falta de privilégio.
+- A consulta da própria loja como `authenticated` foi confirmada com contexto JWT de teste.
+- O projeto tem uma única barbearia e nenhum proprietário duplicado.
+- O advisor de saúde não apontou problemas.
+- O advisor de segurança ainda aponta dois itens: a RPC pública `SECURITY DEFINER` (intencional para lookup anônimo limitado) e a proteção contra senhas vazadas desativada. A segunda configuração precisa ser ativada no painel Auth do Supabase.
 
-## 2. RPC pública com campos mínimos
+## Atenção
 
-A função abaixo expõe somente os campos usados pela página pública. Ela não retorna `owner_user_id`.
+A RPC pública é uma exceção deliberada e restrita. Não conceder acesso anônimo direto à tabela `barbershops`. Se os campos retornados pela página pública mudarem, revisar a RPC e seus privilégios antes de alterar políticas.
 
-```sql
-create or replace function public.get_public_barbershop_by_slug(_slug text)
-returns table (
-  id uuid,
-  name text,
-  slug text,
-  address text,
-  phone text
-)
-language sql
-stable
-security definer
-set search_path = public
-as $$
-  select b.id, b.name, b.slug, b.address, b.phone
-  from public.barbershops b
-  where b.slug = _slug
-  limit 1;
-$$;
-
-revoke all on function public.get_public_barbershop_by_slug(text) from public;
-grant execute on function public.get_public_barbershop_by_slug(text) to anon, authenticated;
-```
-
-Atualizar a rota `src/routes/b.$slug.tsx` para chamar `supabase.rpc("get_public_barbershop_by_slug", { _slug: slug })` e tratar o retorno como uma linha opcional. Publicar e validar a rota pública antes de prosseguir.
-
-## 3. Remover leitura direta anônima
-
-Depois de publicar e validar a RPC:
-
-```sql
-drop policy if exists "Public can view barbershops" on public.barbershops;
-
-create policy "Owner reads own barbershop"
-on public.barbershops
-for select
-to authenticated
-using (auth.uid() = owner_user_id);
-
-revoke select on public.barbershops from anon;
-```
-
-Manter as políticas de INSERT/UPDATE/DELETE do proprietário existentes. Confirmar que o cliente autenticado consegue carregar a própria barbearia e que a página pública continua funcionando via RPC.
-
-## 4. Unicidade de proprietário
-
-Somente depois de confirmar que a consulta da etapa 1 não retorna duplicidades:
-
-```sql
-create unique index if not exists barbershops_one_per_owner
-on public.barbershops(owner_user_id);
-```
-
-## 5. Testes de aceitação
-
-- Visitante anônimo consegue abrir `/b/slug-da-barbearia` e recebe somente nome, slug, endereço e telefone da loja.
-- Visitante anônimo não consegue consultar diretamente a tabela `barbershops`.
-- Proprietário autenticado consegue consultar e editar a própria loja.
-- Proprietário não consegue consultar outra loja.
-- Cadastro de uma segunda barbearia para o mesmo proprietário é rejeitado pelo banco.
-- Serviços e barbeiros ativos continuam visíveis publicamente pelas políticas já existentes.
-
-## Observação
-
-A página pública ainda depende das políticas públicas de leitura de serviços e barbeiros ativos. Não ampliar permissões de escrita para `anon`. Esta alteração resolve a exposição da tabela de barbearias sem quebrar o fluxo público, desde que as etapas sejam aplicadas na ordem indicada.
+A publicação da aplicação e os testes de ponta a ponta no navegador ainda precisam ser confirmados.

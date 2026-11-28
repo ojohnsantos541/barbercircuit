@@ -37,9 +37,18 @@ Permite várias faixas por dia. Exemplo: 09:00–12:00 e 13:00–18:00 represent
 - Sem expediente cadastrado, o agendamento interno falha de forma segura.
 - Antes de remover ou alterar faixas, verificar os compromissos futuros correspondentes. A interface ainda precisa implementar essa verificação preventiva.
 
+## Agendamento público — primeira versão implementada
+
+- RPC `get_public_booking_slots`: consulta expediente, duração do serviço, bloqueios e agendamentos, retornando slots de 15 minutos para até 60 dias.
+- RPC `create_public_booking`: valida serviço e profissional ativos, telefone, data, expediente, bloqueios e conflitos; localiza ou cria cliente pelo telefone e grava o preço atual como snapshot.
+- A reserva usa transação PostgreSQL e lock por barbeiro; a restrição de exclusão continua como proteção adicional contra concorrência.
+- A página `/b/$slug` agora apresenta o fluxo completo de serviço, profissional, data, horário e confirmação.
+- O fluxo foi testado no Supabase com expediente temporário e rollback, sem deixar dados de teste permanentes.
+
 ## Pendências
 
-- A página pública ainda não oferece seleção de serviço, barbeiro, data e horário nem gravação online.
-- Criar RPC transacional de disponibilidade e reserva pública, com validação e proteção contra abuso.
+- Configurar expediente semanal real para cada barbeiro; sem isso, a consulta não retorna horários.
+- Implementar rate limit e CAPTCHA para reduzir abuso automatizado.
 - Implementar notificações persistentes e Web Push; Realtime foi habilitado, mas push não está configurado.
-- Executar testes de integração e validar a aplicação publicada.
+- Publicar a versão mais recente do GitHub no Lovable e validar o fluxo no navegador.
+- Executar build de produção e testes de integração.

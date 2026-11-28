@@ -19,6 +19,11 @@ const blockSchema = z.object({
 });
 const idSchema = z.object({ id: z.string().uuid() });
 
+type WeeklyHour = { id: string; barber_id: string; day_of_week: number; start_time: string; end_time: string };
+type TimeBlock = { id: string; barber_id: string; starts_at: string; ends_at: string; reason: string | null };
+type BarberOption = { id: string; name: string; active: boolean };
+type PageResult<T> = { data: T[] | null; error: { message: string } | null };
+
 async function ownerShop(ctx: any) {
   const { data, error } = await ctx.supabase.from("barbershops").select("id").eq("owner_user_id", ctx.userId).maybeSingle();
   if (error || !data) throw new Error("Não foi possível identificar sua barbearia.");
@@ -35,15 +40,23 @@ function overlaps(a: string, b: string, c: string, d: string) {
 export const getBarberAvailability = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).handler(async ({ context }) => {
   const shopId = await ownerShop(context);
   const db = context.supabase as any;
-  const [hours, blocks, barbers] = await Promise.all([
-    db.from("barber_weekly_hours").select("*").eq("barbershop_id", shopId).order("day_of_week").order("start_time"),
-    fetchAllRows((pageFrom, pageTo) => db.from("barber_time_blocks").select("*")
+  const [hoursResult, blocks, barbersResult] = await Promise.all([
+    db.from("barber_weekly_hours").select("id,barber_id,day_of_week,start_time,end_time")
+      .eq("barbershop_id", shopId).order("day_of_week").order("start_time"),
+    fetchAllRows<TimeBlock>((pageFrom, pageTo) => db.from("barber_time_blocks")
+      .select("id,barber_id,starts_at,ends_at,reason")
       .eq("barbershop_id", shopId).gte("starts_at", new Date().toISOString())
-      .order("starts_at").order("id").range(pageFrom, pageTo)),
+      .order("starts_at").order("id").range(pageFrom, pageTo) as PromiseLike<PageResult<TimeBlock>>),
     db.from("barbers").select("id,name,active").eq("barbershop_id", shopId).order("name"),
   ]);
-  if (hours.error || barbers.error) throw new Error("Não foi possível carregar a disponibilidade. Verifique se as tabelas de disponibilidade já foram criadas no Supabase.");
-  return { hours: hours.data ?? [], blocks, barbers: barbers.data ?? [] };
+  if (hoursResult.error || barbersResult.error) throw new Error("Não foi possível carregar a disponibilidade. Verifique se as tabelas de disponibilidade já foram criadas no Supabase.");
+  const hours: WeeklyHour[] = (hoursResult.data ?? []).map((h: WeeklyHour) => ({
+    id: h.id, barber_id: h.barber_id, day_of_week: h.day_of_week, start_time: h.start_time, end_time: h.end_time,
+  }));
+  const barbers: BarberOption[] = (barbersResult.data ?? []).map((b: BarberOption) => ({
+    id: b.id, name: b.name, active: b.active,
+  }));
+  return { hours, blocks, barbers };
 });
 
 export const saveBarberWeeklyHour = createServerFn({ method: "POST" }).middleware([requireSupabaseAuth]).inputValidator((i: unknown) => weeklySchema.parse(i)).handler(async ({ data, context }) => {

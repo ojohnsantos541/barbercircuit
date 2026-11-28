@@ -81,7 +81,7 @@ export function AppointmentDetails({ a, barberName, trigger }: { a: Appt; barber
   const customerName = a.customers?.name ?? "Cliente";
   const serviceName = a.services?.name ?? "seu serviço";
   const confirmationText = `Olá, ${customerName}! Seu agendamento está confirmado para ${dateLabel} às ${s.time}. Serviço: ${serviceName}. Profissional: ${barberName}. Valor: ${brl(Number(a.price))}. Será um prazer receber você!`;
-  const reminderText = `Olá, ${customerName}! Passando para lembrar do seu atendimento amanhã às ${s.time}, com ${barberName}. Serviço: ${serviceName}. Esperamos por você!`;
+  const reminderText = `Olá, ${customerName}! Este é um lembrete do seu atendimento em ${dateLabel}, às ${s.time}, com ${barberName}. Serviço: ${serviceName}. Esperamos por você!`;
   const confirmationHref = whatsappHref(a.customers?.phone, confirmationText);
   const reminderHref = whatsappHref(a.customers?.phone, reminderText);
   return (

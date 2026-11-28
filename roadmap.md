@@ -31,7 +31,7 @@ As instruções do projeto reservam as alterações de schema ao Lovable. Não e
 - [ ] Criar RPC segura para consultar disponibilidade pública por barbearia, profissional, serviço, expediente e agendamentos existentes.
 - [ ] Criar RPC segura para gravar agendamento público, validar serviço/profissional ativos, criar ou localizar cliente por telefone, registrar snapshot de preço e impedir sobreposição concorrente.
 - [ ] Definir limites/rate limit e validações contra abuso no agendamento público.
-- [ ] Restringir a exposição pública de `barbershops`: a política atual permite leitura anônima da tabela; expor apenas campos públicos por view/RPC.
+- [ ] Restringir a exposição pública de `barbershops`: a política atual permite leitura anônima da tabela; substituir por acesso somente aos campos públicos necessários via view/RPC e adaptar a página pública antes de remover o SELECT anônimo.
 - [ ] Adicionar campos persistentes para slogan, logotipo, expediente semanal e preferências de agendamento.
 - [ ] Adicionar restrição transacional no banco para impedir conflitos de horário mesmo em duas requisições simultâneas.
 - [ ] Criar estrutura de assinaturas, planos, status de cobrança, trial, limites e histórico de pagamentos.
@@ -39,8 +39,9 @@ As instruções do projeto reservam as alterações de schema ao Lovable. Não e
 ## Pendências de produto e operação
 - [ ] Integrar provedor de cobrança recorrente após definição de provedor e credenciais em Secrets.
 - [ ] Implementar gestão de plano, assinatura, cancelamento, inadimplência e limites por plano.
-- [ ] Aplicar pelo Lovable as tabelas barber_weekly_hours e barber_time_blocks com RLS para o proprietário (ver especificação em docs/disponibilidade-barbercircuit.md).
-- [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).\n- [ ] Conectar as regras de disponibilidade à RPC de agendamento público e validar todos os fluxos no ambiente Supabase real.
+- [ ] Aplicar pelo Lovable as tabelas `barber_weekly_hours` e `barber_time_blocks` com RLS para o proprietário (ver especificação em docs/disponibilidade-barbercircuit.md).
+- [x] Interface administrativa para configurar expediente semanal e bloqueios individuais por barbeiro (depende da criação das tabelas no Supabase).
+- [ ] Conectar as regras de disponibilidade à RPC de agendamento público e validar todos os fluxos no ambiente Supabase real.
 - [ ] Implementar upload de logotipo com Supabase Storage e políticas de acesso.
 - [ ] Ativar confirmação/lembretes de agendamento por e-mail/WhatsApp conforme provedor escolhido.
 - [ ] Executar testes de integração com uma conta Supabase real, build de produção e lint.

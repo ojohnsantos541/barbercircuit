@@ -38,22 +38,49 @@ function NotFoundComponent() {
   );
 }
 
+function safeErrorDetails(error: unknown): string {
+  const raw = error instanceof Error
+    ? [error.name + ": " + error.message, error.stack].filter(Boolean).join("\\n")
+    : typeof error === "string"
+      ? error
+      : (() => {
+          try { return JSON.stringify(error, null, 2) ?? String(error); }
+          catch { return String(error); }
+        })();
+
+  // Keep diagnostics useful without exposing auth credentials or bearer tokens.
+  return raw
+    .replace(/\\beyJ[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\b/g, "[JWT REDACTED]")
+    .replace(/\\bsb_(?:publishable|secret)_[A-Za-z0-9_-]+\\b/g, "[SUPABASE KEY REDACTED]")
+    .replace(/(authorization\\s*[:=]\\s*bearer\\s+)\\S+/gi, "$1[REDACTED]")
+    .slice(0, 5000);
+}
+
 function ErrorComponent({ error, reset }: ErrorComponentProps) {
   console.error(error);
   const router = useRouter();
+  const details = safeErrorDetails(error);
   useEffect(() => {
     reportLovableError(error, { boundary: "tanstack_root_error_component" });
   }, [error]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <div className="w-full max-w-2xl text-center">
         <h1 className="text-xl font-semibold tracking-tight text-foreground">
           Não foi possível carregar esta página
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Tente atualizar a página ou voltar ao painel.
+          Ocorreu um erro inesperado. A informação técnica abaixo ajuda a identificar a causa.
         </p>
+        <details className="mt-5 rounded-lg border border-border bg-card p-4 text-left" open>
+          <summary className="cursor-pointer text-sm font-medium text-foreground">
+            Detalhes técnicos do erro
+          </summary>
+          <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap break-words text-xs text-muted-foreground">
+            {details || "O aplicativo não forneceu uma mensagem de erro."}
+          </pre>
+        </details>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
             onClick={() => {

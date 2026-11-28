@@ -7,7 +7,7 @@ import { BarberDialog, DeleteButton } from "@/components/barber/CatalogForms";
 import { catalogQuery } from "@/lib/catalog-query";
 
 export const Route = createFileRoute("/_authenticated/painel/barbeiros")({
-  head: () => ({ meta: [{ title: "Barbeiros — BarberPro" }, { name: "description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:title", content: "Barbeiros — BarberPro" }, { property: "og:description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ title: "Barbeiros — BarberCircuit" }, { name: "description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:title", content: "Barbeiros — BarberCircuit" }, { property: "og:description", content: "Equipe de profissionais e seus horários de atendimento." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   loader: ({ context }) => { void context.queryClient.ensureQueryData(catalogQuery); },
   component: Barbeiros,
   errorComponent: ({ error }) => <div role="alert" className="panel p-6 text-destructive">{error instanceof Error ? error.message : "Não foi possível carregar."}</div>,

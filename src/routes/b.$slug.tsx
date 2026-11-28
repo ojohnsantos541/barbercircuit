@@ -15,7 +15,8 @@ function PublicBarbershop(){
  const {data,isPending,error}=useQuery({
   queryKey:["public-barbershop",slug],
   queryFn:async()=>{
-   const {data:shop,error:shopError}=await supabase.from("barbershops").select("id,name,slug,address,phone").eq("slug",slug).maybeSingle();
+   const {data:shopRows,error:shopError}=await supabase.rpc("get_public_barbershop_by_slug",{_slug:slug});
+   const shop=shopRows?.[0]??null;
    if(shopError)throw shopError;
    if(!shop)return null;
    const [services,barbers]=await Promise.all([

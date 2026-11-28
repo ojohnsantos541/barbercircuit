@@ -1,28 +1,42 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
-import { Scissors, Clock, MapPin, ChevronLeft, Check, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { getShopBySlug, getShopData, toISO } from '@/lib/demo-data';
-import { brl, dateBR } from '@/lib/format';
-import { DemoBadge } from '@/components/barber/ui';
-export const Route = createFileRoute('/b/$slug')({
- head:({params})=>({meta:[{title:`${getShopBySlug(params.slug)?.name ?? 'Barbearia'} — Agendamento | BarberCircuit`},{name:'description',content:'Escolha serviço, profissional e horário no agendamento demonstrativo.'},{property:'og:title',content:`${getShopBySlug(params.slug)?.name ?? 'Barbearia'} — Agendamento`},{property:'og:description',content:'Agendamento online demonstrativo da barbearia.'},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]}),
- component: Booking,
+import { createFileRoute } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { MapPin, Phone, Scissors, Users } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { brl } from "@/lib/format";
+
+export const Route=createFileRoute("/b/$slug")({
+ head:({params})=>({meta:[{title:`Agendamento — ${params.slug} | BarberCircuit`},{name:"description",content:"Conheça os serviços e profissionais desta barbearia."},{property:"og:title",content:"BarberCircuit — Barbearia"},{property:"og:description",content:"Serviços e profissionais da barbearia."},{property:"og:type",content:"website"},{name:"twitter:card",content:"summary"}]}),
+ component:PublicBarbershop,
 });
-function Booking(){
- const {slug}=Route.useParams(); const shop=getShopBySlug(slug);
- const [step,setStep]=useState(0); const [service,setService]=useState(''); const [barber,setBarber]=useState(''); const [date,setDate]=useState(''); const [time,setTime]=useState('');
- if(!shop)return <main className="p-10 text-center"><h1>Barbearia não encontrada</h1><Button asChild><Link to="/">Voltar ao painel</Link></Button></main>;
- const data=getShopData(shop.id); const selected=data.services.find(s=>s.id===service); const professional=data.barbers.find(b=>b.id===barber);
- const dates=Array.from({length:14},(_,i)=>{const d=new Date();d.setDate(d.getDate()+i+1);return toISO(d)});
- const labels=['Serviço','Barbeiro','Data e horário','Seus dados'];
- return <div className="min-h-screen bg-background"><header className="relative h-64 overflow-hidden md:h-80"><img src="/images/barbershop.jpg" alt="Interior da barbearia demonstrativa" className="h-full w-full object-cover"/><div className="booking-cover absolute inset-0"/><div className="absolute inset-x-0 bottom-7 mx-auto max-w-3xl px-5"><DemoBadge/><h1 className="mt-2 text-4xl font-semibold md:text-5xl">{shop.name}</h1><p className="mt-2 flex items-center gap-2 text-sm text-foreground/80"><MapPin className="h-4 w-4"/>{shop.address}</p></div><Button asChild variant="secondary" size="sm" className="absolute right-4 top-4"><Link to="/painel">Painel demonstrativo</Link></Button></header>
- <main className="mx-auto max-w-3xl px-5 py-8">{step<4 ? <><div className="mb-8 flex items-center justify-between gap-2">{labels.map((l,i)=><div key={l} className={`flex items-center gap-2 text-xs ${i===step?'text-primary':'text-muted-foreground'}`}><span className={`grid h-7 w-7 shrink-0 place-items-center rounded-full ${i<=step?'bg-primary text-primary-foreground':'bg-secondary'}`}>{i+1}</span><span className="hidden sm:inline">{l}</span></div>)}</div><h2 className="mb-5 text-3xl">{step===0?'Qual é o seu estilo?':step===1?'Com quem você quer agendar?':step===2?'Escolha o melhor momento':'Quase pronto'}</h2>
- {step===0&&<div className="space-y-3">{data.services.map(s=><Button key={s.id} variant="outline" className={`h-auto w-full justify-start whitespace-normal p-5 text-left ${service===s.id?'border-primary bg-primary/10':''}`} onClick={()=>setService(s.id)}><Scissors className="text-primary"/><span className="flex-1"><span className="block text-base font-semibold">{s.name}</span><span className="mt-1 block text-xs text-muted-foreground">{s.description} · {s.duration} min</span></span><span className="text-primary">{brl(s.price)}</span></Button>)}</div>}
- {step===1&&<div className="grid gap-3 sm:grid-cols-3">{data.barbers.map(b=><Button key={b.id} variant="outline" className={`h-auto flex-col p-6 ${barber===b.id?'border-primary bg-primary/10':''}`} onClick={()=>setBarber(b.id)}><span className="grid h-16 w-16 place-items-center rounded-full bg-secondary text-xl text-primary">{b.initials}</span><span>{b.name}</span><span className="text-xs text-muted-foreground">{b.specialty}</span></Button>)}</div>}
- {step===2&&<><div className="grid grid-cols-4 gap-2 sm:grid-cols-7">{dates.map(d=><Button key={d} variant={date===d?'default':'outline'} className="h-auto flex-col py-3" onClick={()=>{setDate(d);setTime('')}}><span className="text-xs">{dateBR(d,{weekday:'short'})}</span><span className="text-xl">{dateBR(d,{day:'2-digit'})}</span></Button>)}</div><h3 className="mb-3 mt-7 text-xl">Horários de exemplo</h3>{date?<div className="grid grid-cols-3 gap-2 sm:grid-cols-5">{['09:00','10:00','11:00','13:00','14:00','15:00','16:00','17:00'].map(t=><Button key={t} variant={time===t?'default':'outline'} onClick={()=>setTime(t)}><Clock/>{t}</Button>)}</div>:<p className="text-sm text-muted-foreground">Selecione uma data.</p>}<p className="mt-3 text-xs text-muted-foreground">Disponibilidade ilustrativa, sem reserva real.</p></>}
- {step===3&&<form id="booking" className="space-y-4" onSubmit={e=>{e.preventDefault();setStep(4)}}><div className="border-b pb-5 text-sm"><p>{selected?.name} · {professional?.name}</p><p className="mt-1 text-muted-foreground">{dateBR(date)} às {time} · {brl(selected?.price??0)}</p></div><div className="space-y-2"><Label htmlFor="client-name">Seu nome</Label><Input id="client-name" required placeholder="Nome completo"/></div><div className="space-y-2"><Label htmlFor="client-phone">Telefone</Label><Input id="client-phone" required type="tel" placeholder="(11) 99999-9999"/></div><p className="text-xs text-muted-foreground">Esta demonstração não envia seus dados nem confirma um agendamento real.</p></form>}
- <div className="mt-7 flex items-center justify-between">{step>0?<Button variant="ghost" onClick={()=>setStep(step-1)}><ChevronLeft/>Voltar</Button>:<span/>}{step<3?<Button variant="gold" disabled={step===0?!service:step===1?!barber:!date||!time} onClick={()=>setStep(step+1)}>Continuar</Button>:<Button variant="gold" type="submit" form="booking">Concluir demonstração</Button>}</div></>:<div className="py-10 text-center"><Check className="mx-auto h-12 w-12 text-primary"/><h2 className="mt-5 text-3xl">Tudo certo com o exemplo!</h2><p className="mt-3 text-muted-foreground">{selected?.name} com {professional?.name}<br/>{dateBR(date)} às {time}</p><p className="mt-5 text-sm text-primary">Nenhum agendamento real foi criado.</p><Button className="mt-6" variant="outline" onClick={()=>{setStep(0);setService('');setBarber('');setDate('');setTime('')}}>Novo exemplo</Button></div>}</main><footer className="mx-auto max-w-3xl border-t px-5 py-6 text-sm text-muted-foreground"><span className="flex items-center gap-2"><Phone className="h-4 w-4"/>{shop.phone}</span><p className="mt-4 text-xs">Agendamento por BarberCircuit · Barbearia de exemplo</p></footer></div>
+
+function PublicBarbershop(){
+ const {slug}=Route.useParams();
+ const {data,isPending,error}=useQuery({
+  queryKey:["public-barbershop",slug],
+  queryFn:async()=>{
+   const {data:shop,error:shopError}=await supabase.from("barbershops").select("id,name,slug,address,phone").eq("slug",slug).maybeSingle();
+   if(shopError)throw shopError;
+   if(!shop)return null;
+   const [services,barbers]=await Promise.all([
+    supabase.from("services").select("id,name,description,price,duration_minutes").eq("barbershop_id",shop.id).eq("active",true).order("name"),
+    supabase.from("barbers").select("id,name,specialty").eq("barbershop_id",shop.id).eq("active",true).order("name")
+   ]);
+   if(services.error||barbers.error)throw new Error("Não foi possível carregar os dados públicos desta barbearia.");
+   return {shop,services:services.data??[],barbers:barbers.data??[]};
+  }
+ });
+ if(isPending)return <main className="grid min-h-screen place-items-center p-6 text-muted-foreground">Carregando barbearia...</main>;
+ if(error)return <main className="grid min-h-screen place-items-center p-6"><div role="alert" className="panel max-w-lg p-8 text-center text-destructive">{error instanceof Error?error.message:"Não foi possível carregar esta página."}</div></main>;
+ if(!data)return <main className="grid min-h-screen place-items-center p-6"><div className="panel max-w-lg p-8 text-center"><h1 className="text-2xl font-semibold">Barbearia não encontrada</h1><p className="mt-2 text-sm text-muted-foreground">Confira se o link está correto.</p></div></main>;
+ const {shop,services,barbers}=data;
+ return <div className="min-h-screen bg-background">
+  <header className="border-b"><div className="mx-auto max-w-4xl px-5 py-12"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">BarberCircuit</p><h1 className="mt-3 text-4xl font-semibold md:text-5xl">{shop.name}</h1>{shop.address&&<p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="h-4 w-4"/>{shop.address}</p>}{shop.phone&&<a href={`tel:${shop.phone.replace(/[^+0-9]/g,"")}`} className="mt-2 inline-flex items-center gap-2 text-sm text-primary"><Phone className="h-4 w-4"/>{shop.phone}</a>}</div></header>
+  <main className="mx-auto max-w-4xl space-y-8 px-5 py-8">
+   <section className="panel p-5"><h2 className="text-xl font-semibold">Agendamento online</h2><p className="mt-2 text-sm text-muted-foreground">A página já está conectada ao cadastro real da barbearia. A confirmação online de horários será ativada assim que a camada segura de disponibilidade e gravação pública for configurada no banco de dados.</p>{shop.phone&&<Button asChild className="mt-4"><a href={`https://wa.me/${shop.phone.replace(/\D/g,"")}`} target="_blank" rel="noreferrer">Solicitar horário pelo WhatsApp</a></Button>}</section>
+   <section><div className="mb-4 flex items-center gap-2"><Scissors className="h-5 w-5 text-primary"/><h2 className="text-2xl font-semibold">Serviços</h2></div>{services.length===0?<div className="panel p-6 text-sm text-muted-foreground">Nenhum serviço ativo cadastrado.</div>:<div className="grid gap-3 sm:grid-cols-2">{services.map(s=><article key={s.id} className="panel p-5"><h3 className="font-semibold">{s.name}</h3>{s.description&&<p className="mt-1 text-sm text-muted-foreground">{s.description}</p>}<div className="mt-4 flex items-center justify-between"><span className="text-xs text-muted-foreground">{s.duration_minutes} minutos</span><span className="font-display text-xl text-gold">{brl(Number(s.price))}</span></div></article>)}</div>}</section>
+   <section><div className="mb-4 flex items-center gap-2"><Users className="h-5 w-5 text-primary"/><h2 className="text-2xl font-semibold">Profissionais</h2></div>{barbers.length===0?<div className="panel p-6 text-sm text-muted-foreground">Nenhum profissional ativo cadastrado.</div>:<div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">{barbers.map(b=><article key={b.id} className="panel p-5"><h3 className="font-semibold">{b.name}</h3><p className="mt-1 text-sm text-muted-foreground">{b.specialty||"Profissional"}</p></article>)}</div>}</section>
+  </main>
+  <footer className="border-t py-6 text-center text-xs text-muted-foreground">Página oficial de {shop.name} · BarberCircuit</footer>
+ </div>;
 }
